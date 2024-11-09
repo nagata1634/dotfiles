@@ -10,11 +10,11 @@ return {
 {
     "nvim-lualine/lualine.nvim", -- ステータスライン
     dependencies = { "nvim-tree/nvim-web-devicons"},
-}
+},
 {
     "williamboman/mason.nvim", -- mason 言語サーバー
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig",
-}
+},
 
 }
