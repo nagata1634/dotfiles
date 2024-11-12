@@ -1,3 +1,6 @@
 [submodule "config/nvim"]
 	path = config/nvim
 	url = https://github.com/nvim-lua/kickstart.nvim.git
+[submodule "bash-it"]
+	path = bash-it
+	url = https://github.com/Bash-it/bash-it.git
