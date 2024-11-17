@@ -15,6 +15,7 @@ package_lists = {
 # ホームディレクトリのパスを取得
 home = Path.home()
 
+# 設定ファイルの辞書に従ってシンボリックを作成する
 def create_symlinks(config_files):
     for source, dest in config_files.items():
         source_path = Path(source).expanduser()
@@ -34,6 +35,7 @@ def create_symlinks(config_files):
         except Exception as e:
             print(f"Error creating symlink {dest_path}: {e}")
 
+# パッケージリストをインストールする
 def install_package(package_lists):
 
     # パッケージリストをアップデート
