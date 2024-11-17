@@ -1,0 +1,12 @@
+{
+  symbolic_pass : [
+  {
+      source : "~/dotfiles/home/.bashrc",
+      target : "~/.bashrc"
+  },
+  {
+    source : "~/dotfiles/config/nvim/init.lua",
+    target : "~/.config/nvim/init.lua"
+  }
+]
+}
