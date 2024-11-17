@@ -1,0 +1,111 @@
+{
+  "packages": [
+    {
+      "name": "neovim",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "git",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "gh",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "build-essential",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libssl-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "zlib1g-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libbz2-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libreadline-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libsqlite3-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "curl",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libncursesw5-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "xz-utils",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "tk-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libxml2-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libxmlsec1-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "libffi-dev",
+      "version": "latest",
+      "description": "editer"
+    },
+    {
+      "name": "liblzma-dev",
+      "version": "latest",
+      "description": "editer"
+    }
+  ],
+  "groups": {
+    "development": [
+      "neovim",
+      "git",
+      "gh"
+    ],
+    "pyenv": [
+      "build-essential",
+      "libssl-dev",
+      "zlib1g-dev",
+      "libbz2-dev",
+      "libreadline-dev","libsqlite3-dev",
+      "curl",
+      "libncursesw5-dev",
+      "xz-utils",
+      "tk-dev",
+      "libxml2-dev",
+      "libxmlsec1-dev",
+      "libffi-dev",
+      "liblzma-dev"
+    ],
+
+}
