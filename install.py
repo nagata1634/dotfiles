@@ -59,5 +59,5 @@ def install_package(package_lists):
     print('パッケージのインストールが正常に終わりました')
 
 if __name__ == "__main__":
-#    create_symlinks(config_files)
+    create_symlinks(config_files)
     install_package(package_lists)
