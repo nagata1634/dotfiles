@@ -107,4 +107,5 @@
       "libffi-dev",
       "liblzma-dev"
     ]
+  }
 }
