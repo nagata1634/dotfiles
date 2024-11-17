@@ -106,6 +106,5 @@
       "libxmlsec1-dev",
       "libffi-dev",
       "liblzma-dev"
-    ],
-
+    ]
 }
