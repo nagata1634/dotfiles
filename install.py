@@ -47,18 +47,7 @@ def package_installer1(install_package_list, package_version_list):
                 # バージョンを指定
                 install_commands.append(f'{package_name}={version}')
         else:
-            print(f'{package_name}')
-
-
-        exit()
-            if package_version['name'] == package_name:
-                if package_version['version'] == 'latest':
-                # 最新バージョンを指定
-                    install_commands.append(package_name)
-                else:
-                # バージョンを指定する
-                    install_commands.append(f'{package_name}={package_version['version']}')
-
+            print(f'{package_name}のバージョン情報が見つかりませんでした。スキップします。')
 
     # パッケージをインストール
     result = subprocess.run(['sudo','apt','install', '-y'] + install_commands, capture_output=True, text=True)
@@ -112,3 +101,4 @@ if __name__ == "__main__":
     package_set = confirm_action(package_dict)
 
     package_installer(package_set, package_dict['packages'])
+    package_installer1(package_set, package_dict['packages'])
