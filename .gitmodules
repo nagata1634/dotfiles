@@ -1,9 +1,9 @@
 [submodule "config/nvim"]
 	path = config/nvim
 	url = https://github.com/nvim-lua/kickstart.nvim.git
-[submodule "home/.pyenv"]
-	path = home/.pyenv
-	url = https://github.com/pyenv/pyenv.git
 [submodule "home/bash-it"]
 	path = home/bash-it
 	url = https://github.com/Bash-it/bash-it.git
+[submodule "home/pyenv"]
+	path = home/pyenv
+	url = https://github.com/pyenv/pyenv.git

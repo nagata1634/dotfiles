@@ -6,9 +6,6 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-export PYENV_ROOT="$HOME/dotfiles/home/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-export PYENV_ROOT="$HOME/dotfiles/home/.pyenv"
+export PYENV_ROOT="$HOME/dotfiles/home/pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
