@@ -7,7 +7,7 @@ case $- in
 esac
 
 # Path to the bash it configuration
-export BASH_IT="/home/yuuya/dotfiles/home/.bash-it"
+export BASH_IT="/home/yuuya/dotfiles/home/bash-it"
 
 # Lock and Load a custom theme file.
 # Leave empty to disable theming.

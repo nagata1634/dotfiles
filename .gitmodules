@@ -4,3 +4,6 @@
 [submodule "home/.pyenv"]
 	path = home/.pyenv
 	url = https://github.com/pyenv/pyenv.git
+[submodule "home/bash-it"]
+	path = home/bash-it
+	url = https://github.com/Bash-it/bash-it.git
