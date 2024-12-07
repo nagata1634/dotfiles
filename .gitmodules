@@ -10,3 +10,6 @@
 [submodule "home/sdkman-cli"]
 	path = home/sdkman-cli
 	url = https://github.com/sdkman/sdkman-cli.git
+[submodule "DotDiagram"]
+	path = DotDiagram
+	url = git@github.com:nagata1634/dot_diagram.git
