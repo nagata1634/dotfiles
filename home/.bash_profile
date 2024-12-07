@@ -12,4 +12,4 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 # load sdkman
-source "$HOME/dotfiles/home/sdkman-cli/bin/sdkman-init.sh"
+source "$HOME/dotfiles/home/sdkman-cli/src/main/bash/sdkman-init.sh"
