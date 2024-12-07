@@ -7,3 +7,6 @@
 [submodule "home/pyenv"]
 	path = home/pyenv
 	url = https://github.com/pyenv/pyenv.git
+[submodule "home/sdkman-cli"]
+	path = home/sdkman-cli
+	url = https://github.com/sdkman/sdkman-cli.git
