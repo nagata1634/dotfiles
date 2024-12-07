@@ -6,6 +6,10 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
+# load pyenv
 export PYENV_ROOT="$HOME/dotfiles/home/pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+# load sdkman
+source "$HOME/dotfiles/home/sdkman-cli/bin/sdkman-init.sh"
