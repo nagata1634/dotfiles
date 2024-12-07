@@ -101,5 +101,4 @@ if __name__ == "__main__":
     package_set = confirm_action(package_dict)
 
     package_installer(package_set, package_dict['packages'])
-    package_installer1(package_set, package_dict['packages'])
     subprocess.run(['bash', '-c', 'curl -s "https://get.sdkman.io" | bash'], capture_output=True, text=True)
