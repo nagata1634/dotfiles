@@ -21,8 +21,12 @@ pam-u2f               # Yubikey などの U2F 認証を PAM に追加
 pamu2fcfg             # 上記の鍵登録ツール
 
 # --- ハードウェア ---
-ddcutil               # 外部モニタの輝度制御（DDC/CI）
+ddcutil               # 外部モニタの輝度制御（DDC/CI）。scripts/brightness.py が使う
+                      # ※ libddcutil-devel は API を使う開発用なので入れない
 intel-media-driver    # Intel GPU のハードウェアデコード
+                      # ※ RPM Fusion (free) 由来。未導入の環境では先にリポジトリを追加すること
+                      #   rpm-ostree install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+                      #   ベース版 libva-intel-media-driver は override 済み
 
 # --- 開発 / ツール ---
 code                  # Visual Studio Code

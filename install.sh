@@ -72,6 +72,11 @@ check_prereq() {
   if [ "$SKIP_PACKAGES" -eq 0 ]; then
     command -v rpm-ostree >/dev/null 2>&1 \
       || die "rpm-ostree が見つかりません。Fedora Atomic 系専用です（--skip-packages で回避できます）。"
+    # intel-media-driver は RPM Fusion(free) 由来。未導入だとレイヤリングが失敗するので先に案内する。
+    if ! rpm -q rpmfusion-free-release >/dev/null 2>&1; then
+      c_warn "RPM Fusion (free) が未導入です。intel-media-driver のレイヤリングが失敗する場合は先に:"
+      c_warn "  rpm-ostree install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-\$(rpm -E %fedora).noarch.rpm"
+    fi
   fi
 }
 
