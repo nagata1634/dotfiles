@@ -46,14 +46,20 @@ LINK_FILES=(
   ".config/systemd/user/waybar.service"
   ".config/systemd/user/swayidle.service"
   ".config/systemd/user/fcitx5-relock-watch.service"
+  ".bashrc"
+  ".bashrc.d/50-aliases.sh"
   ".bashrc.d/90-tty-locale.sh"
   ".vscode/argv.json"
 )
+# ~/.bashrc.d/ はディレクトリごとリンクしない。環境固有のスクリプト
+# （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # 有効化する systemd --user ユニット（保全系のみ。PWA 常駐や NAS マウントは含めない）
 ENABLE_UNITS=(waybar.service swayidle.service fcitx5-relock-watch.service ssh-agent.socket)
 
 BLOCK_BEGIN="# >>> dotfiles: GUI locale >>>"
 BLOCK_END="# <<< dotfiles: GUI locale <<<"
+SSH_BLOCK_BEGIN="# >>> dotfiles: ssh-agent >>>"
+SSH_BLOCK_END="# <<< dotfiles: ssh-agent <<<"
 
 c_info() { printf '\033[1;34m::\033[0m %s\n' "$*"; }
 c_ok()   { printf '\033[1;32m✓\033[0m %s\n'  "$*"; }
@@ -253,6 +259,34 @@ EOF
   c_ok "~/.bash_profile にロケール読み込みブロックを追加しました"
 }
 
+# ----- 5b. ~/.bash_profile の ssh-agent ブロック ------------------------
+# environment.d は systemd --user にしか効かず、greetd → sway 配下の GUI アプリには
+# 届かない。ロケールと同じくここで補う。
+install_bash_profile_ssh_block() {
+  local f="$HOME/.bash_profile"
+  touch "$f"
+  if grep -qF "$SSH_BLOCK_BEGIN" "$f"; then
+    c_ok "~/.bash_profile の ssh-agent ブロックは既に存在します"
+    return 0
+  fi
+  cat >> "$f" <<EOF
+
+$SSH_BLOCK_BEGIN
+# ssh-agent のソケットを GUI セッションへ渡す。greetd は bash -l -c 'exec sway' で
+# 起動するため、ここでの設定が sway 配下の全 GUI アプリに継承される。
+# environment.d/10-ssh-agent.conf は systemd --user 側にしか効かず、これが無いと
+# VS Code の devcontainer 等から ssh 認証が通らない。値の単一の真実の源は同ファイル。
+# 詳細は ~/.dotfiles/CLAUDE.md の「ssh-agent と鍵のパスフレーズ」を参照。
+if [ -r "\$HOME/.config/environment.d/10-ssh-agent.conf" ]; then
+    set -a
+    . "\$HOME/.config/environment.d/10-ssh-agent.conf"
+    set +a
+fi
+$SSH_BLOCK_END
+EOF
+  c_ok "~/.bash_profile に ssh-agent ブロックを追加しました"
+}
+
 # ----- 6. systemd --user ユニット ---------------------------------------
 enable_units() {
   command -v systemctl >/dev/null 2>&1 || { c_warn "systemctl が無いためスキップ"; return 0; }
@@ -277,7 +311,7 @@ if [ "$SKIP_PACKAGES" -eq 0 ]; then c_info "=== 2/5 パッケージ ==="; layer_
 else c_warn "=== 2/5 パッケージ === スキップ"; fi
 if [ "$SKIP_FONTS" -eq 0 ]; then c_info "=== 3/5 フォント ==="; install_fonts
 else c_warn "=== 3/5 フォント === スキップ"; fi
-c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block
+c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block; install_bash_profile_ssh_block
 c_info "=== 5/5 サービス ==="; enable_units
 
 echo

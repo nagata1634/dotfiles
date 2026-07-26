@@ -68,7 +68,7 @@ systemd --user の起動より sway の環境伝播が後になり、そちら�
 | fcitx5 | `/etc/xdg/autostart/org.fcitx.Fcitx5.desktop`（`fcitx5` パッケージ同梱）→ systemd --user | dotfiles 不要。パッケージを入れれば動く |
 | fcitx5 の再起動 | `systemd --user` : `fcitx5-relock-watch.service` | gtklock 解除後に IME が死ぬ問題の対処 |
 | gnome-keyring | `systemd --user` : `gnome-keyring-daemon.service`（`pkcs11,secrets`） | sway 側では起動しない |
-| ssh-agent | `systemd --user` : `ssh-agent.socket` | `SSH_AUTH_SOCK` は `environment.d/10-ssh-agent.conf` |
+| ssh-agent | `systemd --user` : `ssh-agent.socket` | `SSH_AUTH_SOCK` は `environment.d/10-ssh-agent.conf`（systemd 配下）と `~/.bash_profile`（sway 配下の GUI）の**両方**が要る |
 | Gmail / カレンダー PWA | `systemd --user` : `pwa-gmail.service` / `pwa-calendar.service` | **環境固有なので dotfiles には含めない**。作り方は README 参照 |
 | 環境変数の伝播 | sway : `config.d/30-session-env.conf` + `config.ext.d/31-session-env-locale.conf` | systemd に移せない（上記の理由） |
 | ワークスペース正規化 | sway : `config.ext.d/15-workspace-outputs.conf` の `exec_always` | reload 時も再実行される必要があるため sway 側 |
@@ -188,6 +188,22 @@ LUKS を前提にキーリングのパスワードを外し、プロンプトを
 `SSH_AUTH_SOCK` が存在しないソケットを指し、`ssh-add -l` が接続失敗していた。
 **socket の有効化を忘れないこと**。
 
+**`environment.d` だけでは GUI アプリに届かない**（ロケール分離と同じ構造）。`environment.d` は
+systemd --user 配下にしか効かず、`greetd` → `bash -l -c 'exec sway'` → GUI アプリの経路には
+伝わらない。そのため `~/.bash_profile` の `dotfiles: ssh-agent` ブロックで
+`environment.d/10-ssh-agent.conf` を読み直している（値の単一の真実の源は同ファイル。二重定義しない）。
+
+特徴的な症状: **ターミナルからは `ssh` が通るのに、VS Code の devcontainer から `git push` すると
+`Permission denied (publickey)`**。コンテナ内の `ssh-add -l` は
+`Could not open a connection to your authentication agent` を返す。foot 等のターミナルは
+`.bash_profile` を読むので気付きにくい。Dev Containers は「ホストの `SSH_AUTH_SOCK` を検出して
+コンテナへ転送する」仕組みなので、**VS Code 自体が持っていないと転送も起きない**。
+
+`/proc/$(pgrep -f '/usr/share/code/code' | head -1)/environ` を見れば、VS Code が
+受け取っているか直接確認できる。**VS Code の再起動では直らない**（sway から起動する限り同じ）。
+`devcontainer.json` にソケットのパスを直書きする回避策は、Windows と共用するリポジトリでは
+マウントに失敗して壊れるため採らない。
+
 `~/.ssh/config` に `AddKeysToAgent yes` を入れてある。鍵にパスフレーズを付ける手順:
 
 1. `ssh-keygen -p -f ~/.ssh/github` でパスフレーズを設定
@@ -238,9 +254,27 @@ LUKS を前提にキーリングのパスワードを外し、プロンプトを
 - 同じ理由で stdin がパイプになり `sudo` がパスワードを読めないので、`sudo -v < /dev/tty` で
   事前認証している。
 - `~/.bash_profile` は既存ファイルへの追記なので symlink できない。マーカー
-  （`# >>> dotfiles: GUI locale >>>`）で冪等に挿入している。
+  （`# >>> dotfiles: GUI locale >>>` と `# >>> dotfiles: ssh-agent >>>`）で冪等に挿入している。
 - `~/.config/systemd/user/` はディレクトリごと symlink すると環境固有のユニット
   （`qnap-tpbk.service` など）が消えるため、**ファイル単位**でリンクしている。
+  `~/.bashrc.d/` も同じ理由でファイル単位（後述の `bitwarden.sh` を残すため）。
+
+**bash 環境**
+
+`~/.bashrc` は Fedora のデフォルトをそのまま取り込んだもの。本体は末尾の
+「`~/.bashrc.d/*` を順に読む」ループで、設定の追加はこのディレクトリへのドロップインで行う。
+`oh-my-bash` のようなフレームワークは使っておらず、プロンプトも `/etc/bashrc` 由来のまま。
+`[ -f /etc/bashrc ]` のガードがあるので、`/etc/bashrc` を持たないディストリでも壊れない。
+
+| 置き場所 | 用途 |
+|---|---|
+| `~/.bashrc.d/50-aliases.sh` | エイリアス・関数。**dotfiles 管理下**なので書けば追随する |
+| `~/.bashrc.d/90-tty-locale.sh` | 対話 TTY を `LC_ALL=C.UTF-8` に落とす（ロケール分離） |
+| `~/.bashrc.d/bitwarden.sh` | `bwu`（Bitwarden 解錠）。**dotfiles には含めない** |
+
+`bitwarden.sh` を除外しているのは `toolbox run --container bitwarden-cli` に依存し、
+そのコンテナが無い環境では意味を成さないため。同じ理由で環境固有の関数は dotfiles に入れず、
+`~/.bashrc.d/` へ直接置く。
 
 **公開リポジトリなので機密を入れない**。`pika-repoint.py` は NAS の内部 IP を
 ハードコードしているため `.gitignore` で除外している（sway config からは未参照）。
