@@ -1,0 +1,31 @@
+# rpm-ostree でレイヤリングする「ベースイメージに無い」追加パッケージ。
+#
+# rofi / waybar / dunst / foot / swaylock / Thunar / xarchiver / pavucontrol /
+# firefox / ibus などは Fedora Sway Atomic のベースに含まれるためここには書かない。
+# （ベース同梱パッケージの削除は rpm-ostree override remove が必要でアップデート時に
+#   リスクがあるため、使わないものは NoDisplay で隠す方針。CLAUDE.md 参照）
+#
+# 1行1パッケージ。'#' 以降と空行は無視。
+
+# --- 日本語入力 ---
+fcitx5                # IME 本体（/etc/xdg/autostart 経由で systemd --user が起動する）
+fcitx5-autostart      # 上記の autostart エントリを提供
+fcitx5-mozc           # Mozc 変換エンジン
+
+# --- ログイン / 画面ロック ---
+greetd                # ディスプレイマネージャ
+greetd-selinux        # greetd 用 SELinux ポリシー
+tuigreet              # greetd の TUI greeter（tty1 で使用）
+gtklock               # 画面ロック（ext-session-lock。swaylock から移行）
+pam-u2f               # Yubikey などの U2F 認証を PAM に追加
+pamu2fcfg             # 上記の鍵登録ツール
+
+# --- ハードウェア ---
+ddcutil               # 外部モニタの輝度制御（DDC/CI）
+intel-media-driver    # Intel GPU のハードウェアデコード
+
+# --- 開発 / ツール ---
+code                  # Visual Studio Code
+neovim                # エディタ
+podman-compose        # コンテナ
+fuse-sshfs            # NAS を sshfs でマウントする用

@@ -1,0 +1,14 @@
+[Unit]
+Description=Restart fcitx5 after gtklock unlock (fix dead IME)
+Documentation=https://github.com/fcitx/fcitx5
+PartOf=sway-session.target
+After=sway-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/sway/scripts/fcitx5-relock-watch.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=sway-session.target

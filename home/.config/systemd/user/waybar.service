@@ -1,0 +1,15 @@
+[Unit]
+Description=Waybar status bar
+Documentation=man:waybar(5)
+PartOf=sway-session.target
+After=sway-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/waybar
+ExecReload=/bin/kill -SIGUSR2 $MAINPID
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=sway-session.target

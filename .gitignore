@@ -9,3 +9,13 @@ __pycache__/
 *.swp
 *~
 .DS_Store
+
+# fcitx5 が実行時に生成するキャッシュ（設定ではない）
+home/.config/fcitx5/conf/cached_layouts
+
+# 環境固有のため公開リポジトリに含めないもの
+#   pika-repoint.py は NAS の内部 IP をハードコードしている（sway config からは未参照）
+home/.config/sway/scripts/pika-repoint.py
+
+# install.sh が作る退避ファイル
+*.bak.[0-9]*

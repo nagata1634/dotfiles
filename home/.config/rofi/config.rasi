@@ -1,0 +1,151 @@
+/* Rofi 設定 + テーマ — Nord（Waybar と統一）
+ * rofi 2.0 / -show drun などで使用。
+ */
+
+configuration {
+    modi:                "drun,run,window";
+    show-icons:          true;
+    drun-display-format: "{name}";
+    display-drun:        "󰀻 Apps";
+    display-run:         " Run";
+    display-window:      "󰖯 Window";
+    window-format:       "{w} · {c} · {t}";
+}
+
+* {
+    /* Waybar (style.css) と同一の Nord パレット */
+    base:      #2e3440;   /* nord0  */
+    mantle:    #272c36;   /* Waybar共通の暗色（入力欄/ボタン背景） */
+    crust:     #21252e;   /* Waybar共通のさらに暗い色 */
+    surface0:  #3b4252;   /* nord1  */
+    surface1:  #434c5e;   /* nord2  */
+    overlay:   #4c566a;   /* nord3  */
+    text:      #d8dee9;   /* nord4  */
+    subtext:   #7b88a1;   /* Waybar共通のミュートグレー */
+    blue:      #81a1c1;   /* nord9  */
+    lavender:  #88c0d0;   /* nord8 Frost：Waybar の時計と同じアクセント色 */
+    teal:      #8fbcbb;   /* nord7 Frost */
+    mauve:     #b48ead;   /* nord15 紫（従来アクセント。ピンク見えのため今回外す） */
+    green:     #a3be8c;   /* nord14 */
+    red:       #bf616a;   /* nord11 */
+    peach:     #d08770;   /* nord12 */
+    yellow:    #ebcb8b;   /* nord13 */
+
+    /* アクセントは Frost（水色 lavender=#88c0d0）に統一。Waybar と調和する */
+    accent:    @lavender;
+
+    background-color: transparent;
+    text-color:       @text;
+    font:             "AdwaitaMono Nerd Font 12";
+}
+
+window {
+    transparency: "real";
+    background-color: @base;
+    border:           2px;
+    border-color:     @accent;
+    border-radius:    16px;
+    width:            640px;
+    padding:          0px;
+}
+
+mainbox {
+    padding:  18px;
+    spacing:  14px;
+}
+
+inputbar {
+    background-color: @mantle;
+    border-radius:    12px;
+    padding:          12px 16px;
+    spacing:          10px;
+    children:         [ prompt, entry ];
+}
+prompt {
+    text-color: @accent;
+    font:       "AdwaitaMono Nerd Font 12";
+}
+entry {
+    text-color:        #ffffff;   /* 入力文字を白で見やすく */
+    placeholder:       "検索...";
+    placeholder-color: @subtext;
+}
+
+listview {
+    lines:        8;
+    columns:      1;
+    fixed-height: false;
+    spacing:      0px;
+    scrollbar:    false;
+}
+
+element {
+    padding:          10px 14px;
+    spacing:          12px;
+    background-color: transparent;
+}
+/* 通常行・交互行：背景は黒で統一し、行の下に区切り線を引く */
+element normal.normal,
+element alternate.normal {
+    background-color: transparent;
+    text-color:       @text;
+    border:           0px 0px 1px 0px;
+    border-color:     @surface1;
+}
+/* 選択行：Frost水色バーで強調（区切り線は背景同色にして見えないように） */
+element selected.normal,
+element selected.alternate {
+    background-color: @accent;
+    text-color:       @base;
+    border:           0px 0px 1px 0px;
+    border-color:     @accent;
+}
+/* active（windowモードの現在アクティブ窓など）・urgent 状態も Nord に固定する。
+   未指定だと rofi 既定(solarized)の生成り背景などが漏れてピンク/変色に見えるため。 */
+element normal.active,
+element alternate.active {
+    background-color: transparent;
+    text-color:       @lavender;
+    border:           0px 0px 1px 0px;
+    border-color:     @surface1;
+}
+element selected.active {
+    background-color: @accent;
+    text-color:       @base;
+    border:           0px 0px 1px 0px;
+    border-color:     @accent;
+}
+element normal.urgent,
+element alternate.urgent {
+    background-color: transparent;
+    text-color:       @red;
+    border:           0px 0px 1px 0px;
+    border-color:     @surface1;
+}
+element selected.urgent {
+    background-color: @red;
+    text-color:       @base;
+    border:           0px 0px 1px 0px;
+    border-color:     @red;
+}
+element-icon {
+    size:             1.1em;
+    vertical-align:   0.5;
+}
+element-text {
+    vertical-align: 0.5;
+}
+
+mode-switcher {
+    spacing: 8px;
+}
+button {
+    padding:          8px;
+    background-color: @mantle;
+    border-radius:    10px;
+    text-color:       @subtext;
+}
+button selected {
+    background-color: @surface1;
+    text-color:       @text;
+}

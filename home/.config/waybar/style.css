@@ -1,0 +1,155 @@
+/* Waybar スタイル — Nord / フローティング丸ピル
+ *
+ * 各モジュールを角丸の背景（ピル）で個別に囲うデザイン。
+ * 配色は Nord。アイコンは Font Awesome 6（インストール済み）。
+ */
+
+@define-color base     #2e3440;
+@define-color mantle   #272c36;
+@define-color crust    #21252e;
+@define-color text     #d8dee9;
+@define-color subtext  #7b88a1;
+@define-color surface0 #3b4252;
+@define-color surface1 #434c5e;
+@define-color overlay  #4c566a;
+@define-color blue     #81a1c1;
+@define-color lavender #88c0d0;
+@define-color mauve    #b48ead;
+@define-color green    #a3be8c;
+@define-color red      #bf616a;
+@define-color peach    #d08770;
+@define-color yellow   #ebcb8b;
+@define-color teal     #8fbcbb;
+
+* {
+    font-family: "AdwaitaMono Nerd Font", "Noto Sans CJK JP", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 0;
+}
+
+/* バー本体は透明（ピルを浮かせて見せるため） */
+window#waybar {
+    background: transparent;
+}
+
+/* 共通のピル形状 */
+#workspaces,
+#taskbar,
+#scratchpad,
+#mode,
+#clock,
+#idle_inhibitor,
+#pulseaudio,
+#network,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#battery,
+#tray,
+#custom-notification,
+#custom-power {
+    background: @base;
+    color: @text;
+    padding: 2px 12px;
+    margin: 0;
+    border-radius: 14px;
+}
+
+/* 電源アイコン：赤系で強調＋ホバーで反転 */
+#custom-power {
+    color: @red;
+    font-size: 15px;
+    padding: 2px 14px;
+}
+#custom-power:hover {
+    background: @red;
+    color: @base;
+}
+
+/* ワークスペース：個々のボタン（横に広めのピル） */
+#workspaces {
+    padding: 2px 4px;
+}
+#workspaces button {
+    color: @subtext;
+    background: transparent;
+    padding: 0 16px;
+    margin: 2px 2px;
+    border-radius: 10px;
+    transition: all 0.15s ease;
+}
+#workspaces button.focused,
+#workspaces button.visible {
+    color: @base;
+    background: @lavender;   /* Frost水色。Swayのフォーカス枠・rofiのアクセントと統一 */
+}
+#workspaces button.urgent {
+    color: @base;
+    background: @red;
+}
+#workspaces button:hover {
+    background: @surface1;
+    color: @text;
+}
+
+/* 開いているアプリ一覧：ワークスペースと同じサイズ感のアイコンボタン */
+#taskbar {
+    padding: 2px 4px;
+}
+#taskbar button {
+    background: transparent;
+    padding: 0 8px;
+    margin: 2px 2px;
+    border-radius: 10px;
+    transition: all 0.15s ease;
+}
+#taskbar button.active {
+    background: @surface0;
+}
+#taskbar button:hover {
+    background: @surface1;
+}
+
+/* 中央の日付時計はアクセント色で強調 */
+#clock {
+    color: @lavender;
+    font-weight: 700;
+    padding: 2px 18px;
+}
+
+/* 右側モジュールの色分け */
+#pulseaudio   { color: @yellow; }
+#network      { color: @blue; }
+#cpu          { color: @green; }
+#memory       { color: @teal; }   /* was mauve(ピンク) → Frostティールに */
+#temperature  { color: @peach; }
+#backlight    { color: @yellow; }
+#battery      { color: @green; }
+#idle_inhibitor { color: @subtext; }
+#custom-notification { color: @teal; }
+
+/* 状態色 */
+#temperature.critical { color: @red; }
+#battery.warning  { color: @peach; }
+#battery.critical { color: @red; }
+@keyframes blink {
+    to { color: @base; background: @red; }
+}
+#battery.critical:not(.charging) {
+    animation: blink 1s steps(2) infinite alternate;
+}
+
+#tray {
+    padding: 2px 10px;
+}
+#tray > .passive { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; }
+
+tooltip {
+    background: @mantle;
+    border: 1px solid @surface1;
+    border-radius: 10px;
+    color: @text;
+}

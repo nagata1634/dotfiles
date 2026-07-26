@@ -1,0 +1,11 @@
+# install.sh が ryanoasis/nerd-fonts の Releases から取得する Nerd Font。
+#
+# 形式: <リリース ZIP 名> <タグ>
+#   タグに latest を書くと GitHub API で最新リリースを解決する。
+#   バージョンを固定したい場合は v3.4.0 のように具体的なタグを書く。
+#   展開先は ~/.local/share/fonts/<ZIP名>Nerd/
+#
+# フォント本体をリポジトリに含めないのは、AdwaitaMono だけで 46MB あり
+# clone が重くなるため。1行1フォント。'#' 以降と空行は無視。
+
+AdwaitaMono latest    # foot / waybar / rofi / dunst / sway が参照する等幅フォント

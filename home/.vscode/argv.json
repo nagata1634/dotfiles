@@ -1,0 +1,11 @@
+// VS Code の起動引数。JSON with comments 形式。
+{
+	// sway では XDG_CURRENT_DESKTOP=sway のため Electron の password-store 自動検出が
+	// basic(平文)に落ちる。gnome-libsecret を明示しないと VS Code が
+	// 「認証情報を平文で保存します」と警告し、キーリングに保存されない。
+	// 詳細は ~/.dotfiles/CLAUDE.md の「Secret Service を使うアプリ」を参照。
+	"password-store": "gnome-libsecret",
+
+	// UI 言語。環境変数ではなく VS Code 自身の設定で決まる。
+	"locale": "ja"
+}
