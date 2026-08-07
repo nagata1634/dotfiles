@@ -23,8 +23,8 @@ def apply_h(output):
 
 
 def apply_v(output):
-    """縦モニター（右・反時計回り90度=transform 270）として設定。Wacomも追従。"""
-    swaymsg(f"output {output} mode 2560x1440 position 2560 0 transform 270 "
+    """縦モニター（右・時計回り90度=transform 90）として設定。Wacomも追従。"""
+    swaymsg(f"output {output} mode 2560x1440 position 2560 0 transform 90 "
             f"bg {BG_DIR}/dp5.png fill")
     swaymsg(f"input type:tablet_tool map_to_output {output}")
 

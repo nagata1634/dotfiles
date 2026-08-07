@@ -4,7 +4,7 @@
 USB-C/MSTハブ経由で接続名(DP-5/6→DP-7/8…)が変動しても、
 make/model でKTCの2台を見つけ、名前昇順で
   - 小さい方  → 横向き・左
-  - 大きい方  → 縦向き(reverse=270)・右
+  - 大きい方  → 縦向き(transform 90)・右
 に割り当てる（ユーザー確認済みマッピング）。
 シリアルが Unknown のため、この相対順序が唯一の識別手段。
 順序が逆転したら LOWER_IS_LANDSCAPE を False にする。
@@ -35,9 +35,9 @@ def main():
     # 横モニター（左）。y=967 は下端を縦モニターの物理高さに合わせた値。
     sway("output", landscape, "mode", "2560x1440", "position", "0", "967",
          "transform", "normal", "bg", SPAN + "/dp6.png", "fill")
-    # 縦モニター（反時計回り90度 = transform 270）、右。
+    # 縦モニター（時計回り90度 = transform 90）、右。
     sway("output", portrait, "mode", "2560x1440", "position", "2560", "0",
-         "transform", "270", "bg", SPAN + "/dp5.png", "fill")
+         "transform", "90", "bg", SPAN + "/dp5.png", "fill")
 
 
 if __name__ == "__main__":
