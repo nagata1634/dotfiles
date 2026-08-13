@@ -2,8 +2,10 @@
 __pycache__/
 *.pyc
 
-# Claude Code のローカル設定
-.claude/
+# Claude Code のローカル設定（リポジトリ直下のみ）。
+# 先頭の / が無いと任意の階層にマッチし、管理対象の home/.claude/ まで除外してしまう。
+/.claude/
+home/.claude/settings.local.json
 
 # エディタ/OS
 *.swp

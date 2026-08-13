@@ -50,9 +50,11 @@ LINK_FILES=(
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/90-tty-locale.sh"
   ".vscode/argv.json"
+  ".claude/skills/system-audit"
 )
 # ~/.bashrc.d/ はディレクトリごとリンクしない。環境固有のスクリプト
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
+# ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（保全系のみ。PWA 常駐や NAS マウントは含めない）
 ENABLE_UNITS=(waybar.service swayidle.service fcitx5-relock-watch.service ssh-agent.socket)
 
