@@ -8,4 +8,13 @@
 
 	// UI 言語。環境変数ではなく VS Code 自身の設定で決まる。
 	"locale": "ja"
+,
+
+	// Allows to disable crash reporting.
+	// Should restart the app if the value is changed.
+	"enable-crash-reporter": true,
+
+	// Unique id used for correlating crash reports sent from this instance.
+	// Do not edit this value.
+	"crash-reporter-id": "f8fea9e5-b74b-44f8-89fb-a1ad4c060aa1"
 }

@@ -8,6 +8,8 @@
 import json
 import os
 import subprocess
+import sys
+import syslog
 
 BG_DIR = os.path.expanduser("~/Pictures/background/.span")
 
@@ -36,9 +38,16 @@ def main():
     if t5 == "normal":
         apply_v("DP-5")
         apply_h("DP-6")
+        result = "DP-5=縦/右 DP-6=横/左"
     else:
         apply_h("DP-5")
         apply_v("DP-6")
+        result = "DP-5=横/左 DP-6=縦/右"
+
+    # 操作履歴を journal に残す（journalctl -t sway-menu）。
+    # rofi を経由しないため lib/rofi.py の記録に乗らず、ここで自前で残す。
+    syslog.openlog("sway-menu")
+    syslog.syslog(syslog.LOG_INFO, f"{os.path.basename(sys.argv[0])} → {result}")
 
 
 if __name__ == "__main__":

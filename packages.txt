@@ -12,11 +12,11 @@ fcitx5                # IME 本体（/etc/xdg/autostart 経由で systemd --user
 fcitx5-autostart      # 上記の autostart エントリを提供
 fcitx5-mozc           # Mozc 変換エンジン
 
-# --- ログイン / 画面ロック ---
+# --- ログイン ---
+# 画面ロックは持たない（gtklock は撤去済み）。理由は CLAUDE.md の「ロックを持たない設計」。
 greetd                # ディスプレイマネージャ
 greetd-selinux        # greetd 用 SELinux ポリシー
 tuigreet              # greetd の TUI greeter（tty1 で使用）
-gtklock               # 画面ロック（ext-session-lock。swaylock から移行）
 pam-u2f               # Yubikey などの U2F 認証を PAM に追加
 pamu2fcfg             # 上記の鍵登録ツール
 

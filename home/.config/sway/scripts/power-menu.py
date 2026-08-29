@@ -108,7 +108,7 @@ def upgrade_next_version():
 
 def main():
     rows = [
-        rofi.row("󰌾  ロック", "lock screen rokku"),
+        rofi.row("󰍹  画面を消す", "blank screen off gamen kesu"),
         rofi.row("󰒲  サスペンド", "suspend sleep sasupendo"),
         rofi.row("󰍃  ログアウト", "logout exit logoff roguauto"),
         rofi.row("󰜉  再起動", "reboot restart saikidou"),
@@ -123,13 +123,16 @@ def main():
         return
 
     # 判定順は重要（"OS更新して再起動" 等が "再起動" を含むため、再起動は最後に）
-    if "ロック" in choice:
-        subprocess.run(["gtklock", "-d"])
+    if "画面を消す" in choice:
+        # 暗転のみ。この環境にロック画面は無い（理由は ~/.dotfiles/CLAUDE.md）。
+        subprocess.run(["systemctl", "--user", "start", "sway-idle-blank.service"])
     elif "サスペンド" in choice:
         subprocess.run(["systemctl", "suspend"])
     elif "ログアウト" in choice:
         if rofi.confirm("ログアウトしますか？"):
-            subprocess.run(["swaymsg", "exit"])
+            # ログアウトの出口は sway-logout.service に一本化してある。
+            subprocess.run(["systemctl", "--user", "start", "--no-block",
+                            "sway-logout.service"])
     elif "シャットダウン" in choice:
         if rofi.confirm("シャットダウンしますか？"):
             subprocess.run(["systemctl", "poweroff"])

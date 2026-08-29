@@ -5,7 +5,7 @@
 #   2) packages.txt を rpm-ostree でレイヤリング（不足分のみ）
 #   3) fonts.txt の Nerd Font を ~/.local/share/fonts へ導入
 #   4) home/ 配下を ~/ にシンボリックリンク（既存実体はタイムスタンプ付きで退避）
-#   5) ~/.bash_profile にロケール読み込みブロックを冪等に挿入
+#   5) ~/.bash_profile に ~/.profile の読み込みブロックを冪等に挿入
 #   6) 保全系 systemd --user ユニットを有効化
 #
 # 冪等。再実行しても安全。curl | bash でも動く。
@@ -42,12 +42,24 @@ done
 LINK_DIRS=(sway rofi waybar dunst foot fcitx5 environment.d)
 # 個別ファイルでリンクするもの（リポジトリ内 home/ からの相対パス = ~/ からの相対パス）
 LINK_FILES=(
+  # GUI セッションの環境の起点。greetd が読むのは ~/.bash_profile ではなくこちら。
+  ".profile"
   ".config/locale.env"
   ".config/systemd/user/waybar.service"
   ".config/systemd/user/swayidle.service"
-  ".config/systemd/user/fcitx5-relock-watch.service"
+  # アイドル・離席・ログアウトの連鎖（ロック画面は持たない）
+  ".config/systemd/user/sway-idle-blank.service"
+  ".config/systemd/user/sway-idle-resume.service"
+  ".config/systemd/user/sway-away-mark.service"
+  ".config/systemd/user/sway-away-check.service"
+  ".config/systemd/user/sway-sleep-prepare.service"
+  ".config/systemd/user/sway-lid-logout.service"
+  ".config/systemd/user/sway-logout.service"
+  # ログイン後に Magic Trackpad の入力を入れ直す（環境固有だが害は無いので含める）
+  ".config/systemd/user/sway-trackpad-reset.service"
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
+  ".bashrc.d/60-editor.sh"
   ".bashrc.d/90-tty-locale.sh"
   ".vscode/argv.json"
   ".claude/skills/system-audit"
@@ -55,13 +67,14 @@ LINK_FILES=(
 # ~/.bashrc.d/ はディレクトリごとリンクしない。環境固有のスクリプト
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
-# 有効化する systemd --user ユニット（保全系のみ。PWA 常駐や NAS マウントは含めない）
-ENABLE_UNITS=(waybar.service swayidle.service fcitx5-relock-watch.service ssh-agent.socket)
+# 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
+ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket)
 
-BLOCK_BEGIN="# >>> dotfiles: GUI locale >>>"
-BLOCK_END="# <<< dotfiles: GUI locale <<<"
-SSH_BLOCK_BEGIN="# >>> dotfiles: ssh-agent >>>"
-SSH_BLOCK_END="# <<< dotfiles: ssh-agent <<<"
+PROFILE_BEGIN="# >>> dotfiles: profile >>>"
+PROFILE_END="# <<< dotfiles: profile <<<"
+# 旧構成のマーカー。ロケールと ssh-agent を ~/.bash_profile に直書きしていた頃のもので、
+# 中身は ~/.profile に移設済み。見つけたら撤去する。
+LEGACY_BLOCKS=("dotfiles: GUI locale" "dotfiles: ssh-agent")
 
 c_info() { printf '\033[1;34m::\033[0m %s\n' "$*"; }
 c_ok()   { printf '\033[1;32m✓\033[0m %s\n'  "$*"; }
@@ -235,58 +248,40 @@ deploy() {
   fi
 }
 
-# ----- 5. ~/.bash_profile のロケールブロック ----------------------------
-# symlink できない（既存ファイルへの追記になる）ため、マーカーで冪等に挿入する。
+# ----- 5. ~/.bash_profile から ~/.profile を読ませる ---------------------
+# GUI セッションの環境（ロケール・ssh-agent）の実体は ~/.profile にある。greetd が
+#   [ -f /etc/profile ] && . /etc/profile; [ -f $HOME/.profile ] && . $HOME/.profile; exec sway
+# を実行するためで、~/.bash_profile は GUI セッションでは読まれない。
+# 一方 bash のログインシェルは ~/.bash_profile があると ~/.profile を読まないので、
+# symlink できないこのファイルにだけマーカーで読み込み行を挿入する。
 install_bash_profile_block() {
-  local f="$HOME/.bash_profile"
+  local f="$HOME/.bash_profile" name
   touch "$f"
-  if grep -qF "$BLOCK_BEGIN" "$f"; then
-    c_ok "~/.bash_profile のロケールブロックは既に存在します"
+
+  # 旧構成（ロケールと ssh-agent を直書きしていた2ブロック）の撤去。
+  for name in "${LEGACY_BLOCKS[@]}"; do
+    grep -qF "# >>> $name >>>" "$f" || continue
+    [ -e "$f.bak.$TS" ] || cp -a "$f" "$f.bak.$TS"
+    sed -i "/^# >>> $name >>>\$/,/^# <<< $name <<<\$/d" "$f"
+    c_ok "~/.bash_profile の旧ブロックを撤去しました: $name"
+  done
+
+  if grep -qF "$PROFILE_BEGIN" "$f"; then
+    c_ok "~/.bash_profile の ~/.profile 読み込みブロックは既に存在します"
     return 0
   fi
   cat >> "$f" <<EOF
 
-$BLOCK_BEGIN
-# GUI(sway)セッション用ロケールを適用する。/etc/profile.d/lang.sh が VT 上のログイン
-# シェルで LANG を en_US に置換するため、その後にあたるこの位置で上書きする。
-# TTY では ~/.bashrc.d/90-tty-locale.sh が先に LC_ALL を立てるのでスキップされる。
-# 詳細は ~/.dotfiles/CLAUDE.md の「ロケール分離」を参照。
-if [ -z "\${LC_ALL:-}" ] && [ -r "\$HOME/.config/locale.env" ]; then
-    set -a
-    . "\$HOME/.config/locale.env"
-    set +a
-fi
-$BLOCK_END
+$PROFILE_BEGIN
+# bash のログインシェルは ~/.bash_profile があると ~/.profile を読まないため明示的に読む。
+# ロケールと ssh-agent の実体は ~/.profile 側（greetd が GUI セッションで読むのはそちら）。
+# ~/.bashrc の後に置くこと: TTY では .bashrc 側が先に LC_ALL を立て、
+# ~/.profile のガードがそれを尊重して英語のまま保つ。
+# 詳細は ~/.dotfiles/CLAUDE.md の「GUI セッションの環境（~/.profile）」を参照。
+[ -r "\$HOME/.profile" ] && . "\$HOME/.profile"
+$PROFILE_END
 EOF
-  c_ok "~/.bash_profile にロケール読み込みブロックを追加しました"
-}
-
-# ----- 5b. ~/.bash_profile の ssh-agent ブロック ------------------------
-# environment.d は systemd --user にしか効かず、greetd → sway 配下の GUI アプリには
-# 届かない。ロケールと同じくここで補う。
-install_bash_profile_ssh_block() {
-  local f="$HOME/.bash_profile"
-  touch "$f"
-  if grep -qF "$SSH_BLOCK_BEGIN" "$f"; then
-    c_ok "~/.bash_profile の ssh-agent ブロックは既に存在します"
-    return 0
-  fi
-  cat >> "$f" <<EOF
-
-$SSH_BLOCK_BEGIN
-# ssh-agent のソケットを GUI セッションへ渡す。greetd は bash -l -c 'exec sway' で
-# 起動するため、ここでの設定が sway 配下の全 GUI アプリに継承される。
-# environment.d/10-ssh-agent.conf は systemd --user 側にしか効かず、これが無いと
-# VS Code の devcontainer 等から ssh 認証が通らない。値の単一の真実の源は同ファイル。
-# 詳細は ~/.dotfiles/CLAUDE.md の「ssh-agent と鍵のパスフレーズ」を参照。
-if [ -r "\$HOME/.config/environment.d/10-ssh-agent.conf" ]; then
-    set -a
-    . "\$HOME/.config/environment.d/10-ssh-agent.conf"
-    set +a
-fi
-$SSH_BLOCK_END
-EOF
-  c_ok "~/.bash_profile に ssh-agent ブロックを追加しました"
+  c_ok "~/.bash_profile に ~/.profile の読み込みを追加しました"
 }
 
 # ----- 6. systemd --user ユニット ---------------------------------------
@@ -313,7 +308,7 @@ if [ "$SKIP_PACKAGES" -eq 0 ]; then c_info "=== 2/5 パッケージ ==="; layer_
 else c_warn "=== 2/5 パッケージ === スキップ"; fi
 if [ "$SKIP_FONTS" -eq 0 ]; then c_info "=== 3/5 フォント ==="; install_fonts
 else c_warn "=== 3/5 フォント === スキップ"; fi
-c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block; install_bash_profile_ssh_block
+c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block
 c_info "=== 5/5 サービス ==="; enable_units
 
 echo

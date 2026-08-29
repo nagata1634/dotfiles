@@ -1,12 +1,23 @@
 [Unit]
-Description=swayidle idle manager (gtklock lock)
+Description=swayidle アイドル管理（ロックはしない。暗転→サスペンド→離席判定）
 Documentation=man:swayidle(1)
 PartOf=sway-session.target
 After=sway-session.target
 
 [Service]
 Type=simple
-ExecStart=%h/.config/sway/scripts/swayidle-run.sh
+# アイドル 300s→暗転＋離席記録、900s→サスペンド(s2idle)。
+# 各アクションは unit に切り出してある（journal に残り、単体でテストできる）。
+#
+# -w は必須。before-sleep を同期実行させ、swayidle が握る sleep delay inhibitor
+# （logind の InhibitDelayMaxSec=5s）の猶予内にログアウトを完了させる。
+# これが logind のサスペンドと sway のログアウトの順序を確定させる唯一の手段。
+ExecStart=/usr/bin/swayidle -w \
+    timeout 300 'systemctl --user start sway-idle-blank.service' \
+         resume 'systemctl --user start sway-idle-resume.service' \
+    timeout 900 'systemctl suspend' \
+    before-sleep 'systemctl --user start sway-sleep-prepare.service' \
+    after-resume 'systemctl --user start sway-away-check.service'
 Restart=on-failure
 RestartSec=1
 

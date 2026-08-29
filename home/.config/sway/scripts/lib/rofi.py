@@ -5,8 +5,21 @@
 """
 import os
 import subprocess
+import sys
+import syslog
 
 THEME = os.path.expanduser("~/.config/rofi/config.rasi")
+
+
+def _log(choice):
+    """操作履歴を journal に残す（journalctl -t sway-menu）。
+
+    「どのメニューを開いたか」だけでなく「何を選んだか」まで残す。
+    logger コマンドではなく標準ライブラリを使う（プロセス起動が不要）。
+    """
+    syslog.openlog("sway-menu")
+    syslog.syslog(syslog.LOG_INFO,
+                  f"{os.path.basename(sys.argv[0])} → {choice or '(キャンセル)'}")
 
 
 def dmenu(items, prompt=None, no_custom=False, password=False, lines=None,
@@ -38,8 +51,17 @@ def dmenu(items, prompt=None, no_custom=False, password=False, lines=None,
     text = items if isinstance(items, str) else "\n".join(items)
     p = subprocess.run(cmd, input=text, capture_output=True, text=True)
     out = p.stdout.strip()
+
     if index:
-        return int(out) if out != "" else None
+        idx = int(out) if out != "" else None
+        # index モードでは番号ではなく選ばれた行の表示ラベルを残す（\0meta 以降は除く）。
+        rows = text.split("\n")
+        label = rows[idx].split("\0", 1)[0] if idx is not None and idx < len(rows) else ""
+        _log(label)
+        return idx
+
+    # 伏字入力の中身は絶対に残さない。
+    _log("(パスワード入力)" if password and out else out)
     return out
 
 

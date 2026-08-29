@@ -1,0 +1,14 @@
+[Unit]
+Description=離席が長すぎればログアウトする
+ConditionPathExists=%t/sway-away-since
+PartOf=sway-session.target
+
+[Service]
+Type=oneshot
+# しきい値は 3 時間。一時的に変えるなら systemctl --user edit sway-away-check.service
+Environment=SWAY_AWAY_LIMIT=10800
+ExecCondition=%h/.config/sway/scripts/away-expired.sh
+ExecStart=/usr/bin/systemctl --user start --no-block sway-logout.service
+# ExecCondition が非0で抜けた場合も ExecStopPost は実行される（man systemd.service）。
+# ログアウトしてもしなくても記録はここで必ず消える。
+ExecStopPost=/usr/bin/rm -f %t/sway-away-since

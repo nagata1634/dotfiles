@@ -18,7 +18,7 @@ curl -fsSL https://raw.githubusercontent.com/nagata1634/dotfiles/main/install.sh
 2. `packages.txt` を `rpm-ostree` でレイヤリング（不足分のみ・要再起動）
 3. `fonts.txt` の Nerd Font を `~/.local/share/fonts` へ導入
 4. `home/` 配下を `~/` にシンボリックリンク（既存実体はタイムスタンプ付きで退避）
-5. `~/.bash_profile` にロケール読み込みブロックを挿入
+5. `~/.bash_profile` に `~/.profile` の読み込みブロックを挿入
 6. 保全系 `systemd --user` ユニットを有効化
 
 ### オプション
@@ -58,7 +58,9 @@ curl -fsSL https://raw.githubusercontent.com/nagata1634/dotfiles/main/install.sh
 | `home/.config/waybar/`, `dunst/`, `foot/` | バー / 通知 / ターミナル |
 | `home/.config/fcitx5/` | 日本語入力（Mozc の学習履歴・個人辞書は含まない） |
 | `home/.config/environment.d/`, `locale.env` | ロケールと IME の環境変数 |
-| `home/.config/systemd/user/` | waybar / swayidle / fcitx5 再起動の保全系ユニットのみ |
+| `home/.config/systemd/user/` | waybar / swayidle と、アイドル・離席・ログアウトの `sway-*` ユニット |
+| `home/.profile` | GUI セッションの環境（ロケール / ssh-agent）。greetd が読む唯一の入口 |
+| `home/.bashrc.d/60-editor.sh` | `EDITOR` / `VISUAL` |
 | `home/.bashrc.d/90-tty-locale.sh` | TTY を英語ロケールに落とす（豆腐対策） |
 | `home/.vscode/argv.json` | VS Code の password-store 指定（sway では必須） |
 | `packages.txt` | `rpm-ostree` レイヤリング対象 |
@@ -72,9 +74,11 @@ curl -fsSL https://raw.githubusercontent.com/nagata1634/dotfiles/main/install.sh
   依存する設定は `config.ext.d` に分離してあり、`--minimal` で除外できる。
 - **ロケールは GUI = 日本語 / TTY = 英語**: VT はコンソールフォント（PSF）の制約で日本語を
   描けないため、復旧作業で使う TTY は英語に保つ。GUI 側だけ日本語にする配線が入っている。
-- **常駐は systemd に寄せている**: waybar・swayidle・fcitx5 再起動はすべて `systemd --user`。
+- **常駐は systemd に寄せている**: waybar・swayidle はすべて `systemd --user`。
   Sway config に残っている `exec` は環境変数の伝播とワークスペース正規化の 2 つだけ
   （どちらも原理的に Sway 側で実行する必要がある）。
+- **ロック画面は持たない**: 離席が 3 時間を超えたら、または内蔵画面だけで蓋を閉じたら
+  セッションごと終了して tuigreet に戻す。理由は `CLAUDE.md`。
 - **config には短文だけ**: `exec <command>` / `bindsym <key> exec <command>` のみを書き、
   シェルロジックは `scripts/` の小さなツールに置く。
 - **日本語を打つピッカーは rofi**: fuzzel は IME 非対応で日本語変換入力ができないため使わない。
