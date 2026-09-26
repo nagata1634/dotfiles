@@ -171,8 +171,11 @@ busctl --user call org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel \
 # 解除は配列長 0。確認は shortcutKeys as 4 <component> <action> "" ""
 ```
 
-これで即時反映＋KWin が自分でファイルへ永続化する。System Settings のショートカット KCM も
-内部ではこれを呼んでいる。仮想デスクトップ数も同様に `kwinrc [Desktops] Number` の書き換えでは
+**ただし `setForeignShortcutKeys` はキーを記録するだけで待ち受けが有効にならない**（実機で
+Meta+2 が無反応だった）。`setShortcutKeys`（第3引数 flags = 6 = SetPresent|NoAutoloading）で
+登録すると即座に効く。もう1つの罠: **Shift+数字は記号側のキーで届く**（US 配列で Meta+Shift+3 は
+KWin には `Meta+Shift+#` として来る）ので、`Window to Desktop N` には `Meta+Shift+N` と
+`Meta+Shift+<記号>`・`Meta+<記号>` の3表現を併記して登録してある（実機で移動を確認済み）。仮想デスクトップ数も同様に `kwinrc [Desktops] Number` の書き換えでは
 増えず、`qdbus-qt6 org.kde.KWin /VirtualDesktopManager createDesktop <pos> <name>` で増やす。
 
 **キーバインド設計**（Sway の `$mod+hjkl` を素に設計。テンキー非依存）:
@@ -191,7 +194,7 @@ busctl --user call org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel \
 ### 適用状況（2026-09-27 に D-Bus 経由で適用・実機確認済み）
 
 - Polonium 残留（`Polonium*` 21 アクション）: すべて解除
-- `Switch to Desktop 1〜10` = `Meta+1〜0`、`Window to Desktop 1〜10` = `Meta+Shift+1〜0`
+- `Switch to Desktop 1〜10` = `Meta+1〜0`、`Window to Desktop 1〜10` = `Meta+Shift+1〜0`（＋記号表現、上記）
   （既定所有者だった plasmashell の `activate task manager entry 1〜9` と kwin の
   `view_actual_size`(Meta+0) は解除）
 - 仮想デスクトップ数 7 → 10
