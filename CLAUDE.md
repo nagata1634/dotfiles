@@ -572,6 +572,8 @@ Polonium 残骸を落とす。`restore` は plasmashell を止めてコピーし
 毎時バックアップが全部 `LockTimeout` していたのに気づけなかった**ため、`backup-check`（`home/.local/bin/`、
 `backup-check.timer` で日 1 回）が Pika の `history.json` の最終成功を見て 24h 超なら通知する。
 復旧は `flatpak run --command=borg org.gnome.World.PikaBackup break-lock <repo>`（borg 非稼働を確認してから）。
+**Pika の除外に `~/mnt` が無いと NAS の共有（1.1 TB、borg repo 自身を含む）を丸ごと取り込む**（2026-09-27 に発覚、
+2 時間で repo が 21 GB 膨らんだ）。sshfs のマウント先を `~` 配下に置く以上、除外は必須。
 **`qnap-tpbk.service`（sshfs）を Pika の実行中に restart してはいけない**: マウントが borg の足元から消え
 `OSError: [Errno 107] Transport endpoint is not connected` → `Local Exception` で落ち、ロックも残る
 （2026-09-27 に自分でやらかした）。unit を触る前に `pgrep -x borg` が空であることを確認する。
