@@ -1,0 +1,6 @@
+[Unit]
+Description=Pika Backup の最終成功が 24 時間より古ければ通知する
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/backup-check

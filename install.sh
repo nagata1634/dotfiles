@@ -84,6 +84,10 @@ LINK_FILES=(
   ".config/systemd/user/pwa-gmail.service"
   ".config/systemd/user/flextop-backup-cleanup.service"
   ".config/systemd/user/flextop-backup-cleanup.path"
+  # Pika Backup の最終成功を日 1 回監視(3 か月止まっていたのに気づけなかった反省)
+  ".local/bin/backup-check"
+  ".config/systemd/user/backup-check.service"
+  ".config/systemd/user/backup-check.timer"
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/60-editor.sh"
@@ -95,7 +99,7 @@ LINK_FILES=(
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
-ENABLE_UNITS=(ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service qnap-tpbk.service pwa-calendar.service pwa-gmail.service flextop-backup-cleanup.path)
+ENABLE_UNITS=(ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service qnap-tpbk.service pwa-calendar.service pwa-gmail.service flextop-backup-cleanup.path backup-check.timer)
 
 # 自作の KDE 拡張。公開物(GitHub Releases / KDE Store)を一般ユーザーと同じ経路で導入する。
 # 書式: "<GitHub repo>|<KPackage type>|<package id>|<asset の末尾>|<導入後に実行する package 内スクリプト(任意)>"

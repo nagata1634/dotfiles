@@ -29,6 +29,10 @@ CONFIG_FILES=(
   powerdevilrc kscreenlockerrc ksmserverrc   # 電源・ロック・セッション
   dolphinrc konsolerc spectaclerc katevirc kwriterc bluedevilglobalrc ktimezonedrc baloofilerc
 )
+# $HOME からの相対パス。KDE 以外で「設定だけ」記録したいもの
+EXTRA_FILES=(
+  .var/app/org.gnome.World.PikaBackup/config/pika-backup/backup.json   # Pika: repo の場所・対象・スケジュール(パスフレーズは keyring)
+)
 # ~/.local/share からの相対パス(ディレクトリ可)
 DATA_DIRS=(
   plasma_icons   # デスクトップの「アイコン」ウィジェットの実体(.desktop)
@@ -60,6 +64,10 @@ save() {
   for f in "${DATA_DIRS[@]}"; do
     [ -d "$HOME/.local/share/$f" ] || continue
     rm -rf "$SNAP/share/$f"; cp -a "$HOME/.local/share/$f" "$SNAP/share/$f"
+  done
+  for f in "${EXTRA_FILES[@]}"; do
+    [ -f "$HOME/$f" ] || continue
+    mkdir -p "$SNAP/extra/$(dirname "$f")"; cp "$HOME/$f" "$SNAP/extra/$f"
   done
   # 機密の混入チェック(公開リポジトリ)。PAM の "password" 行のような一般語は対象外にできないので目視も併用。
   if grep -rilE 'passwd=|token=|secret=|apikey|api_key' "$SNAP" >/dev/null; then
@@ -103,6 +111,16 @@ PY
     [ -d "$SNAP/share/$f" ] || continue
     mkdir -p "$HOME/.local/share/$f"; cp -a "$SNAP/share/$f/." "$HOME/.local/share/$f/"
   done
+  # Pika は起動中に backup.json を書き戻すので、止めてから置く
+  if [ -f "$SNAP/extra/.var/app/org.gnome.World.PikaBackup/config/pika-backup/backup.json" ]; then
+    flatpak kill org.gnome.World.PikaBackup 2>/dev/null || true
+  fi
+  for f in "${EXTRA_FILES[@]}"; do
+    [ -f "$SNAP/extra/$f" ] || continue
+    mkdir -p "$HOME/$(dirname "$f")"
+    [ -f "$HOME/$f" ] && ! cmp -s "$SNAP/extra/$f" "$HOME/$f" && cp -a "$HOME/$f" "$HOME/$f.bak.$TS"
+    install -m 0600 "$SNAP/extra/$f" "$HOME/$f"
+  done
   [ "$running" = 1 ] && { kstart plasmashell >/dev/null 2>&1 & }
   qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
   c_ok "復元しました（退避: ~/.config/*.bak.$TS）"
@@ -114,6 +132,10 @@ diff_() {
   for f in "${CONFIG_FILES[@]}"; do
     [ -f "$SNAP/config/$f" ] || continue
     if ! sanitize "$f" < "$HOME/.config/$f" 2>/dev/null | diff -u --label "snapshot/$f" --label "live/$f" "$SNAP/config/$f" - ; then rc=1; fi
+  done
+  for f in "${EXTRA_FILES[@]}"; do
+    [ -f "$SNAP/extra/$f" ] || continue
+    diff -u --label "snapshot/$f" --label "live/$f" "$SNAP/extra/$f" "$HOME/$f" || rc=1
   done
   [ "$rc" = 0 ] && c_ok "差分なし"
   return $rc

@@ -1,0 +1,51 @@
+[
+  {
+    "config_version": 2,
+    "id": "b5ed8e6b-26bb-4c89-b613-89602c5befd3",
+    "archive_prefix": "ccfb95-",
+    "repo_id": "70a5337510f7273585e6f0868807b61f3c5378bad48c1d5bb788d216946d94b9",
+    "repo": {
+      "type": "Local",
+      "path": "/home/yuuya/mnt/qnap-tpbk/backup-fedora-yuuya",
+      "mount_path": "/",
+      "uri": null,
+      "drive_name": null,
+      "mount_name": null,
+      "volume_uuid": null,
+      "volume_uuid_identifier": null,
+      "removable": false,
+      "icon": null,
+      "icon_symbolic": null,
+      "settings": null
+    },
+    "encrypted": false,
+    "encryption_mode": "repokey",
+    "include": [
+      ""
+    ],
+    "exclude": [
+      "Caches",
+      "Trash",
+      "VmsContainers"
+    ],
+    "schedule": {
+      "enabled": true,
+      "settings": {
+        "run_on_battery": false
+      },
+      "frequency": "Hourly"
+    },
+    "prune": {
+      "enabled": true,
+      "keep": {
+        "hourly": 48,
+        "daily": 14,
+        "weekly": 4,
+        "monthly": 12,
+        "yearly": 10
+      }
+    },
+    "title": "",
+    "user_scripts": {}
+  }
+]

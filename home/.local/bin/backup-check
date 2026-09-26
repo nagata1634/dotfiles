@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""backup-check — Pika Backup の最終成功が古ければ通知する（backup-check.timer が日 1 回実行）。
+
+2026-06-22 を最後に borg のロック残りで 3 か月バックアップが止まっていたのに気づけなかった反省。
+Pika の history.json だけを見る（borg や NAS には触らない）。終了コード: 0=OK, 1=古い/無い。
+    backup-check            判定して古ければ notify-send
+    backup-check --quiet    通知しない（install.sh などから）
+"""
+import json, os, subprocess, sys
+from datetime import datetime, timedelta, timezone
+
+HIST = os.path.expanduser("~/.var/app/org.gnome.World.PikaBackup/config/pika-backup/history.json")
+MAX_AGE = timedelta(hours=24)
+
+def last_success():
+    try:
+        h = json.load(open(HIST))
+    except Exception:
+        return None, "history.json が読めません"
+    best, err = None, None
+    for runs in (v.get("run", []) for v in h.values()):
+        for r in runs:
+            o = r.get("outcome")
+            if o == "Completed" or (isinstance(o, dict) and "Completed" in o):
+                t = datetime.fromisoformat(r["end"][:26] + r["end"][29:]) if "+" in r["end"] else datetime.fromisoformat(r["end"])
+                best = max(best, t) if best else t
+            elif err is None and runs and r is runs[0]:
+                err = str(o)[:80]
+    return best, err
+
+best, err = last_success()
+now = datetime.now(timezone.utc)
+if best and now - best <= MAX_AGE:
+    print(f"OK: 最終成功 {best.astimezone():%Y-%m-%d %H:%M} ({int((now-best).total_seconds()//60)} 分前)")
+    sys.exit(0)
+msg = f"Pika Backup の最終成功が {best.astimezone():%Y-%m-%d %H:%M}" if best else "Pika Backup の成功記録がありません"
+if err: msg += f"\n直近の失敗: {err}"
+print("WARN:", msg.replace("\n", " / "))
+if "--quiet" not in sys.argv:
+    subprocess.run(["notify-send", "-u", "critical", "-a", "backup-check", "バックアップが止まっています", msg])
+sys.exit(1)

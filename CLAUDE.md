@@ -565,6 +565,14 @@ Polonium 残骸を落とす。`restore` は plasmashell を止めてコピーし
 ショートカット・仮想デスクトップ数・出力配置は KWin が起動時にしか読まない（罠5）ので、復元後は
 ログアウト→ログインで確定する。
 
+**Pika Backup はこの流れの正式な一段**（`bootstrap/README.md` の表）。設定（`backup.json`: repo は sshfs
+`~/mnt/qnap-tpbk/backup-fedora-yuuya`、`~` 全体、毎時、prune 有効）は `kde-snapshot` の `EXTRA_FILES` で
+記録し、データは再構築後に Pika の UI から**選択復元**する。NAS 鍵の循環依存は Yubikey の resident key
+（`ssh-keygen -K`）で断つ。**2026-06-22〜09-27 の 3 か月間、borg のロック残り（`lock.exclusive`）で
+毎時バックアップが全部 `LockTimeout` していたのに気づけなかった**ため、`backup-check`（`home/.local/bin/`、
+`backup-check.timer` で日 1 回）が Pika の `history.json` の最終成功を見て 24h 超なら通知する。
+復旧は `flatpak run --command=borg org.gnome.World.PikaBackup break-lock <repo>`（borg 非稼働を確認してから）。
+
 **記録しないもの（意図的）**: 壁紙画像、`~/Documents` 等のデータ（Pika Backup）、`~/.config/Yubico/
 u2f_keys`（機器固有）、kwallet/keyring の中身、`kactivitymanagerd-statsrc` 等の統計、Konsole 以外の
 アプリ内データ。
