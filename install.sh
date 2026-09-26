@@ -351,6 +351,11 @@ install_kde_packages() {
       kpackagetool6 -t "$type" -i "$tmp/pkg$suffix" >/dev/null && c_ok "導入: $id ($(basename "$url"))"
     fi
     rm -rf "$tmp"
+    # 壁紙プラグインは plasmashell が読み込み済みの古い QML を持ったままになり、一部の画面だけ
+    # 余白色になることがある(2026-09-27 実機で発生)。更新したら plasmashell を再起動する。
+    if [ "$type" = "Plasma/Wallpaper" ] && systemctl --user is-active plasma-plasmashell.service >/dev/null 2>&1; then
+      systemctl --user restart plasma-plasmashell.service && c_ok "plasmashell を再起動（$id 反映）"
+    fi
     if [ -n "$post" ]; then
       local dir
       dir="$(kpackagetool6 -t "$type" -s "$id" 2>/dev/null | grep -oE 'Path *: *.*' | sed 's/Path *: *//')"
