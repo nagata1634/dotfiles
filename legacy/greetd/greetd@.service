@@ -1,0 +1,20 @@
+[Unit]
+Description=Greeter daemon on %I
+After=systemd-user-sessions.service plymouth-quit-wait.service
+After=getty@%i.service
+Conflicts=getty@%i.service
+
+[Service]
+Type=simple
+ExecStart=greetd --config /etc/greetd/config-%i.toml
+IgnoreSIGPIPE=no
+SendSIGHUP=yes
+TimeoutStopSec=30s
+KeyringMode=shared
+Restart=always
+RestartSec=1
+StartLimitBurst=5
+StartLimitInterval=30
+
+[Install]
+WantedBy=graphical.target

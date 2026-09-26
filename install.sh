@@ -42,7 +42,7 @@ done
 LINK_DIRS=(sway rofi waybar dunst foot fcitx5 environment.d)
 # 個別ファイルでリンクするもの（リポジトリ内 home/ からの相対パス = ~/ からの相対パス）
 LINK_FILES=(
-  # GUI セッションの環境の起点。greetd が読むのは ~/.bash_profile ではなくこちら。
+  # GUI セッションの環境の起点。plasmalogin の wayland-session が bash --login 経由で読む（greetd 時代と同じ経路）。
   ".profile"
   ".config/locale.env"
   ".config/systemd/user/waybar.service"
@@ -225,6 +225,33 @@ install_fonts() {
   fi
 }
 
+# ----- 3b. docker-compose（podman compose の provider）-------------------
+# podman-compose のレイヤを外し、公式の静的バイナリを ~/.local/bin に置く。
+# `podman compose` は PATH の docker-compose を provider として使う。VS Code の
+# dev.containers.dockerComposePath は GUI の PATH に ~/.local/bin が無いため絶対パスで指定する。
+COMPOSE_REPO="docker/compose"
+install_compose() {
+  local dest="$HOME/.local/bin/docker-compose" tag url tmp
+  mkdir -p "$HOME/.local/bin"
+  tag="$(curl -fsSL "https://api.github.com/repos/$COMPOSE_REPO/releases/latest" \
+         | grep -m1 '"tag_name"' | cut -d'"' -f4)" || tag=""
+  [ -n "$tag" ] || { c_warn "docker-compose: 最新タグを取得できません（スキップ）"; return 0; }
+  if [ -x "$dest" ] && "$dest" version --short 2>/dev/null | grep -qx "${tag#v}"; then
+    c_ok "docker-compose 導入済み: $tag"
+    return 0
+  fi
+  url="https://github.com/$COMPOSE_REPO/releases/download/$tag/docker-compose-linux-x86_64"
+  tmp="$(mktemp -d)"
+  c_info "docker-compose を取得: $tag"
+  curl -fsSL "$url" -o "$tmp/docker-compose" && curl -fsSL "$url.sha256" -o "$tmp/sum" \
+    || { rm -rf "$tmp"; c_warn "docker-compose の取得に失敗しました（スキップ）"; return 0; }
+  ( cd "$tmp" && sed 's# .*# docker-compose#' sum | sha256sum -c --quiet ) \
+    || { rm -rf "$tmp"; die "docker-compose: sha256 が一致しません"; }
+  install -m 0755 "$tmp/docker-compose" "$dest"
+  rm -rf "$tmp"
+  c_ok "docker-compose 導入: $tag → $dest"
+}
+
 # ----- 4. シンボリックリンク --------------------------------------------
 # $1 = リポジトリ内 home/ 以下のパス, $2 = $HOME 以下のパス
 link_one() {
@@ -270,7 +297,7 @@ deploy() {
 }
 
 # ----- 5. ~/.bash_profile から ~/.profile を読ませる ---------------------
-# GUI セッションの環境（ロケール・ssh-agent）の実体は ~/.profile にある。greetd が
+# GUI セッションの環境（ロケール・ssh-agent）の実体は ~/.profile にある。DM（plasmalogin）が
 #   [ -f /etc/profile ] && . /etc/profile; [ -f $HOME/.profile ] && . $HOME/.profile; exec sway
 # を実行するためで、~/.bash_profile は GUI セッションでは読まれない。
 # 一方 bash のログインシェルは ~/.bash_profile があると ~/.profile を読まないので、
@@ -295,7 +322,7 @@ install_bash_profile_block() {
 
 $PROFILE_BEGIN
 # bash のログインシェルは ~/.bash_profile があると ~/.profile を読まないため明示的に読む。
-# ロケールと ssh-agent の実体は ~/.profile 側（greetd が GUI セッションで読むのはそちら）。
+# ロケールと ssh-agent の実体は ~/.profile 側（DM が GUI セッションで読むのはそちら）。
 # ~/.bashrc の後に置くこと: TTY では .bashrc 側が先に LC_ALL を立て、
 # ~/.profile のガードがそれを尊重して英語のまま保つ。
 # 詳細は ~/.dotfiles/CLAUDE.md の「GUI セッションの環境（~/.profile）」を参照。
@@ -329,6 +356,7 @@ if [ "$SKIP_PACKAGES" -eq 0 ]; then c_info "=== 2/5 パッケージ ==="; layer_
 else c_warn "=== 2/5 パッケージ === スキップ"; fi
 if [ "$SKIP_FONTS" -eq 0 ]; then c_info "=== 3/5 フォント ==="; install_fonts
 else c_warn "=== 3/5 フォント === スキップ"; fi
+install_compose
 c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block
 c_info "=== 5/5 サービス ==="; enable_units
 
