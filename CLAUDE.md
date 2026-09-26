@@ -157,10 +157,23 @@ KWin スクリプト）を導入。2026-09-07 に一度設定したが、**2026-
 マウス下のウィンドウに自動フォーカスが戻るため、`Meta+H/J/K/L` でフォーカス移動しても
 即座に元に戻る。`ClickToFocus` に変更して解決（現状もこの設定のまま）。
 
-**罠5: kglobalaccel/ksmserver は常駐デーモンで、設定ファイルを書き換えても稼働中の状態には
-反映されない**。KWin 自身は `qdbus-qt6 org.kde.KWin /KWin reconfigure` で効くが、
-`ksmserver` 等は同等の dbus メソッドが無く**ログアウト→ログインでしか確実に反映されない**
-（ただし cursorprobe の件でこの前提自体が崩れたケースがある。次々節参照）。
+**罠5（2026-09-27 に真因確定）: Plasma 6.7 のグローバルショートカットは KWin 本体が握っている**。
+`busctl --user status org.kde.kglobalaccel` の所有者は `kwin_wayland`（`plasma-kglobalaccel.service`
+は static で動いていない）。KWin は起動時に `kglobalshortcutsrc` を読み、**終了時に自分の
+メモリ上の状態で書き戻す**ので、ファイルを `kwriteconfig6` で書き換えても反映されず、ログアウトで
+元に戻る（これが「設計したのに未適用」の正体）。`qdbus-qt6 org.kde.KWin /KWin reconfigure` も
+ショートカットは読み直さない。**正しい変更方法は稼働中の D-Bus API**:
+
+```sh
+# 例: kwin の "Switch to Desktop 1" を Meta+1 に（キーは QKeySequence().toCombined() の整数）
+busctl --user call org.kde.kglobalaccel /kglobalaccel org.kde.KGlobalAccel \
+  setForeignShortcutKeys 'asa(ai)' 4 kwin "Switch to Desktop 1" "" "" 1 4 268435505 0 0 0
+# 解除は配列長 0。確認は shortcutKeys as 4 <component> <action> "" ""
+```
+
+これで即時反映＋KWin が自分でファイルへ永続化する。System Settings のショートカット KCM も
+内部ではこれを呼んでいる。仮想デスクトップ数も同様に `kwinrc [Desktops] Number` の書き換えでは
+増えず、`qdbus-qt6 org.kde.KWin /VirtualDesktopManager createDesktop <pos> <name>` で増やす。
 
 **キーバインド設計**（Sway の `$mod+hjkl` を素に設計。テンキー非依存）:
 - Krohnkite デフォルトの `Meta+H/J/K/L`（フォーカス）・`Shift+H/J/K/L`（移動）・
@@ -175,22 +188,14 @@ KWin スクリプト）を導入。2026-09-07 に一度設定したが、**2026-
 - Overview(`Meta+W`)、クリップボード履歴(`Meta+V`)、アクティビティ(`Meta+A`) 等の
   KDE ネイティブ機能は変更せず維持
 
-### 既知の未解決/未適用（2026-09-14 確認）
+### 適用状況（2026-09-27 に D-Bus 経由で適用・実機確認済み）
 
-実機の `kglobalshortcutsrc` を検証した結果、上記の設計のうち**罠2の対処とデスクトップ
-キーバインドが実際には未適用**と判明している:
-
-- Polonium 側の `PoloniumActivateAbove/Below/Left/Right`（`Meta+K/J/H/L`）、
-  `PoloniumPlace*`（`Meta+Shift+K/J/H/L`）、`PoloniumResize*`（`Meta+Ctrl+K/J/H/L`）等が
-  `none` に解除されないまま残っている
-- `Switch to Desktop 1〜4` が `Ctrl+F1〜F4\tMeta+F1〜F4` のまま（設計の `Meta+1〜0` になっていない）、
-  5〜10 は未設定、`Window to Desktop *` も全て未設定
-
-修正時は `kwriteconfig6 --file kglobalshortcutsrc --group kwin --key <アクション名>
-"<値>,<デフォルト>,<説明>"` で書き換え、**罠5のとおり反映にはログアウト→ログインが
-必要**な可能性がある（cursorprobe の件では dbus reconfigure では一切ロードされず、
-再起動しても直らなかったので、krohnkite 側のキーバインドも同様に不安定な可能性がある。
-反映確認は必ず実機で行うこと）。
+- Polonium 残留（`Polonium*` 21 アクション）: すべて解除
+- `Switch to Desktop 1〜10` = `Meta+1〜0`、`Window to Desktop 1〜10` = `Meta+Shift+1〜0`
+  （既定所有者だった plasmashell の `activate task manager entry 1〜9` と kwin の
+  `view_actual_size`(Meta+0) は解除）
+- 仮想デスクトップ数 7 → 10
+- Krohnkite の `Meta+H/J/K/L` 系はそのまま（Polonium との二重登録が消えた）
 
 ---
 
