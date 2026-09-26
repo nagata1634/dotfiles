@@ -572,6 +572,11 @@ Polonium 残骸を落とす。`restore` は plasmashell を止めてコピーし
 毎時バックアップが全部 `LockTimeout` していたのに気づけなかった**ため、`backup-check`（`home/.local/bin/`、
 `backup-check.timer` で日 1 回）が Pika の `history.json` の最終成功を見て 24h 超なら通知する。
 復旧は `flatpak run --command=borg org.gnome.World.PikaBackup break-lock <repo>`（borg 非稼働を確認してから）。
+**`qnap-tpbk.service`（sshfs）を Pika の実行中に restart してはいけない**: マウントが borg の足元から消え
+`OSError: [Errno 107] Transport endpoint is not connected` → `Local Exception` で落ち、ロックも残る
+（2026-09-27 に自分でやらかした）。unit を触る前に `pgrep -x borg` が空であることを確認する。
+`~/.claude`（会話履歴とメモリ、この PC で唯一 GitHub に無いもの）は Pika とは別に
+`rsync -a ~/.claude/ ~/mnt/qnap-tpbk/claude-home-snapshot/claude/` で即時退避できる。
 
 **記録しないもの（意図的）**: 壁紙画像、`~/Documents` 等のデータ（Pika Backup）、`~/.config/Yubico/
 u2f_keys`（機器固有）、kwallet/keyring の中身、`kactivitymanagerd-statsrc` 等の統計、Konsole 以外の
