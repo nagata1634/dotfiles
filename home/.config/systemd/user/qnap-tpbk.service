@@ -1,0 +1,23 @@
+[Unit]
+Description=sshfs mount: QNAP TS-233 /share/TPBK -> ~/mnt/qnap-tpbk
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+ExecStartPre=/usr/bin/mkdir -p %h/mnt/qnap-tpbk
+
+ExecStart=/usr/bin/sshfs -f \
+  -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,idmap=user \
+  -o follow_symlinks,allow_other,kernel_cache,cache=yes \
+  -o IdentityFile=/home/yuuya/.ssh/yuuya-nas \
+  -o StrictHostKeyChecking=accept-new \
+  qnap-yuuya:/share/CACHEDEV2_DATA/TPBK %h/mnt/qnap-tpbk
+
+ExecStop=-/usr/bin/fusermount3 -u -z %h/mnt/qnap-tpbk
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=default.target

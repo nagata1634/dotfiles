@@ -71,6 +71,19 @@ LINK_FILES=(
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.dark"
   # ※ Monitor Align(KWin スクリプト)と Span Image(壁紙プラグイン)は独立リポジトリで公開しており、
   #   KDE_PACKAGES が GitHub Releases のアーカイブ(= KDE Store と同一物)を kpackagetool6 で導入する。
+  # KDE 設定のスナップショット(save/restore/diff)。実体は home/.config/kde-snapshot/ にコピーで持つ。
+  ".local/bin/kde-snapshot"
+  # Flatpak の権限 override と、Obsidian(freedesktop 26.08 ランタイム)の日本語豆腐回避
+  ".local/share/flatpak/overrides/global"
+  ".local/share/flatpak/overrides/com.brave.Browser"
+  ".local/share/flatpak/overrides/com.bitwarden.desktop"
+  ".var/app/md.obsidian.Obsidian/config/fontconfig/fonts.conf"
+  # NAS の sshfs マウント、Brave PWA、flextop の残骸掃除
+  ".config/systemd/user/qnap-tpbk.service"
+  ".config/systemd/user/pwa-calendar.service"
+  ".config/systemd/user/pwa-gmail.service"
+  ".config/systemd/user/flextop-backup-cleanup.service"
+  ".config/systemd/user/flextop-backup-cleanup.path"
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/60-editor.sh"
@@ -82,14 +95,18 @@ LINK_FILES=(
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
-ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service)
+ENABLE_UNITS=(ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service qnap-tpbk.service pwa-calendar.service pwa-gmail.service flextop-backup-cleanup.path)
 
 # 自作の KDE 拡張。公開物(GitHub Releases / KDE Store)を一般ユーザーと同じ経路で導入する。
 # 書式: "<GitHub repo>|<KPackage type>|<package id>|<asset の末尾>|<導入後に実行する package 内スクリプト(任意)>"
 KDE_PACKAGES=(
   "nagata1634/kwin-monitoralign|KWin/Script|monitoralign|.kwinscript|contents/install-daemon.sh"
   "nagata1634/plasma-spanimage|Plasma/Wallpaper|dev.yuya.spanimage|.wallpaper.zip|"
+  # Krohnkite(動的タイル)。KDE Store と同じ .kwinscript が GitHub Release にある
+  "anametologin/krohnkite|KWin/Script|krohnkite|.kwinscript|"
 )
+# サードパーティのテーマ(Aurorae 装飾とアイコン)。各リポジトリの install.sh に任せる
+THEME_REPOS=(vinceliuice/WhiteSur-kde vinceliuice/WhiteSur-icon-theme)
 
 PROFILE_BEGIN="# >>> dotfiles: profile >>>"
 PROFILE_END="# <<< dotfiles: profile <<<"
@@ -364,6 +381,64 @@ install_kde_packages() {
   done
 }
 
+# ----- 5c. Flatpak --------------------------------------------------------
+install_flatpaks() {
+  command -v flatpak >/dev/null 2>&1 || { c_warn "flatpak が無いためスキップ"; return 0; }
+  local list="$DOTFILES_DIR/flatpaks.txt" id
+  [ -f "$list" ] || return 0
+  flatpak remote-add --if-not-exists --system flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+  while read -r id; do
+    id="${id%%#*}"; id="${id//[[:space:]]/}"; [ -z "$id" ] && continue
+    if flatpak info --system "$id" >/dev/null 2>&1; then c_ok "Flatpak 導入済み: $id"
+    elif flatpak install -y --system --noninteractive flathub "$id" >/dev/null 2>&1; then c_ok "Flatpak 導入: $id"
+    else c_warn "Flatpak 導入失敗: $id"; fi
+  done < "$list"
+}
+
+# ----- 5d. サードパーティのテーマ ------------------------------------------
+# WhiteSur の Aurorae 装飾(kwinrc)とアイコン(kdeglobals)を kde-snapshot が参照する。
+install_themes() {
+  command -v kpackagetool6 >/dev/null 2>&1 || return 0
+  local repo dir src="$HOME/.cache/dotfiles-src"
+  mkdir -p "$src"
+  for repo in "${THEME_REPOS[@]}"; do
+    dir="$src/${repo##*/}"
+    if [ -d "$dir/.git" ]; then git -C "$dir" pull -q --ff-only 2>/dev/null || true
+    else git clone -q --depth 1 "https://github.com/$repo.git" "$dir" || { c_warn "$repo: clone 失敗"; continue; }; fi
+    case "${repo##*/}" in
+      WhiteSur-kde)        ( cd "$dir" && ./install.sh >/dev/null 2>&1 ) && c_ok "テーマ: WhiteSur-kde" || c_warn "WhiteSur-kde の install.sh が失敗" ;;
+      WhiteSur-icon-theme) ( cd "$dir" && ./install.sh -d "$HOME/.local/share/icons" >/dev/null 2>&1 ) && c_ok "テーマ: WhiteSur-icon-theme" || c_warn "WhiteSur-icon-theme の install.sh が失敗" ;;
+    esac
+  done
+}
+
+# ----- 5e. KDE 設定スナップショットの復元 ----------------------------------
+# 初回(スナップショットと実機が違うとき)だけ復元する。日常の再実行では触らない。
+restore_kde_snapshot() {
+  command -v kde-snapshot >/dev/null 2>&1 || [ -x "$HOME/.local/bin/kde-snapshot" ] || return 0
+  [ -d "$DOTFILES_DIR/home/.config/kde-snapshot/config" ] || return 0
+  if "$HOME/.local/bin/kde-snapshot" diff >/dev/null 2>&1; then c_ok "KDE 設定はスナップショットと一致"; return 0; fi
+  if [ -t 0 ] || [ -e /dev/tty ]; then
+    printf '\033[1;34m::\033[0m KDE 設定が dotfiles のスナップショットと異なります。復元しますか？ [y/N] '
+    local ans; read -r ans < /dev/tty || ans=n
+    [ "$ans" = y ] || { c_warn "復元をスキップ（差分は kde-snapshot diff で確認）"; return 0; }
+  fi
+  "$HOME/.local/bin/kde-snapshot" restore
+}
+
+# ----- 5f. authselect(Yubikey → 指紋 → パスワード) ---------------------------
+# /etc/authselect/custom/yuya-auth は authselect の正規の置き場(手で /etc を編集するのではなく
+# authselect が管理する)。u2f の鍵登録(~/.config/Yubico/u2f_keys)は機器固有なので pamu2fcfg で手動。
+install_authselect() {
+  command -v authselect >/dev/null 2>&1 || return 0
+  local src="$DOTFILES_DIR/system/authselect/yuya-auth"
+  if authselect current 2>/dev/null | grep -q "custom/yuya-auth"; then c_ok "authselect: custom/yuya-auth 選択済み"; return 0; fi
+  c_info "authselect の custom/yuya-auth を導入します（管理者認証）"
+  pkexec sh -c "mkdir -p /etc/authselect/custom/yuya-auth && cp '$src'/* /etc/authselect/custom/yuya-auth/ && authselect select custom/yuya-auth with-pam-u2f with-fingerprint with-mdns4 with-silent-lastlog --force" \
+    && c_ok "authselect: custom/yuya-auth を適用" || c_warn "authselect の適用に失敗（後で手動: pkexec authselect select custom/yuya-auth …）"
+  [ -f "$HOME/.config/Yubico/u2f_keys" ] || c_warn "Yubikey 未登録: mkdir -p ~/.config/Yubico && pamu2fcfg > ~/.config/Yubico/u2f_keys"
+}
+
 # ----- 6. systemd --user ユニット ---------------------------------------
 enable_units() {
   command -v systemctl >/dev/null 2>&1 || { c_warn "systemctl が無いためスキップ"; return 0; }
@@ -390,17 +465,13 @@ if [ "$SKIP_FONTS" -eq 0 ]; then c_info "=== 3/5 フォント ==="; install_font
 else c_warn "=== 3/5 フォント === スキップ"; fi
 install_compose
 c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block
-c_info "=== 5/5 サービス ==="; enable_units; install_kde_packages
+c_info "=== 5/5 サービスと KDE 環境 ==="; enable_units; install_kde_packages; install_flatpaks; install_themes; install_authselect; restore_kde_snapshot
 
 echo
 c_ok "セットアップ完了。"
 echo
 c_info "次の手順:"
-echo "  • 壁紙を ~/Pictures/background/ に配置（sway/config と config.d/10-outputs.conf 参照）"
-echo "  • ロケールの配線を確認:  locale-audit"
-echo "  • Gmail / カレンダーの PWA 常駐は環境固有のため別途セットアップ（README 参照）"
-if [ "$NEED_REBOOT" -eq 1 ]; then
-  echo "  • パッケージを反映するため再起動:  systemctl reboot"
-else
-  echo "  • ログインし直すか Sway を再読み込み:  swaymsg reload"
-fi
+echo "  • KDE 設定を復元した場合はログアウト→ログイン（ショートカット・仮想デスクトップ・モニタ配置の確定）"
+echo "  • Yubikey 未登録なら:  mkdir -p ~/.config/Yubico && pamu2fcfg > ~/.config/Yubico/u2f_keys"
+echo "  • データは Pika Backup（NAS）から復元。ブラウザ/Bitwarden のログインは手動"
+echo "  • 設定を変えたら:  kde-snapshot save  → commit"

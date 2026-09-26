@@ -1,0 +1,12 @@
+[Unit]
+Description=Gmail PWA (Brave, ログイン時に起動)
+PartOf=plasma-workspace.target
+After=plasma-workspace.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/flatpak run com.brave.Browser --app=https://mail.google.com/
+RemainAfterExit=yes
+
+[Install]
+WantedBy=plasma-workspace.target

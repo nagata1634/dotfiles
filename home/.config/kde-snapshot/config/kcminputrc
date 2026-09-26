@@ -1,0 +1,5 @@
+[Libinput][1386][888][Wacom Intuos BT M Pen]
+OutputUuid=0930235f-d2f4-4d11-b190-4792756d6dac
+
+[Tablet]
+SyncWithMouse=false

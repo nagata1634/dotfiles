@@ -1,0 +1,6 @@
+[Unit]
+Description=Remove flextop backup folders
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'd="%h/.local/share/applications"; f=$(find "$d" -maxdepth 1 -type d -name ".flextop-backup-*"); [ -n "$f" ] && { echo "$f" | xargs rm -rf; update-desktop-database "$d"; } || true'

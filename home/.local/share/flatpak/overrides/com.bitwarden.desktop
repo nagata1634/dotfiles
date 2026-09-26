@@ -1,0 +1,6 @@
+[Context]
+sockets=!x11;
+filesystems=/run/udev:ro;
+
+[Environment]
+USE_X11=false

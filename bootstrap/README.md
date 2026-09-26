@@ -1,74 +1,46 @@
-# bootstrap — OS インストールの自動化
+# bootstrap — OS インストールの自動化（Fedora Kinoite, PXE + Kickstart）
 
-`fedora-sway-atomic.ks` は Fedora Sway Atomic (Sericea) を自動インストールする Kickstart。
+`fedora-kinoite.ks` は Fedora Kinoite を自動インストールする Kickstart。PXE サーバーは別リポジトリ
+[nagata1634/pxe-boot](https://github.com/nagata1634/pxe-boot)（QNAP NAS 上の dnsmasq proxyDHCP + nginx）。
 
-## 2 層に分かれている理由
+## 全体像（環境を作り直す手順）
 
-| 層 | 担当 | 実行タイミング |
+| 段階 | 担当 | 内容 |
 |---|---|---|
-| `fedora-sway-atomic.ks` | パーティション・LUKS・ロケール・ユーザー作成 | OS インストール時 |
-| `../install.sh` | 設定の symlink・パッケージレイヤリング・フォント・systemd ユニット | 初回ログイン後 |
+| 1. OS | `fedora-kinoite.ks`（PXE 経由） | パーティション・LUKS・ロケール・ostree deploy・plasmalogin |
+| 2. 初回起動 | Plasma Setup（Kinoite 標準） | ユーザー作成 |
+| 3. ユーザー環境 | `../install.sh` | レイヤ（要再起動）・フォント・symlink・Flatpak・テーマ・KDE 拡張・authselect・**KDE 設定スナップショットの復元** |
+| 4. 確定 | ログアウト → ログイン | ショートカット・仮想デスクトップ・モニタ配置は KWin が起動時に読む |
+| 5. 手動 | `pamu2fcfg`、Pika Backup からデータ復元、Bitwarden/ブラウザのログイン | 機器固有・機密は記録しない |
 
-Atomic の Kickstart `%post` はイメージが deploy された直後の状態しか触れず、
-**`rpm-ostree` によるパッケージレイヤリングができない**。`systemd --user` も動いていないため
-ユニットの有効化もできない。よって `%post` ではヒントを置くだけに留めている。
+Atomic の Kickstart `%post` はイメージが deploy された直後の状態しか触れず、**`rpm-ostree` による
+レイヤリングができない**。`systemd --user` も動いていない。よって `%post` はヒントを置くだけ。
 
 ## 完全自動にはならない点
 
-意図的に 2 箇所で対話入力が入る。**公開リポジトリに機密を書かないため**。
+意図的に対話が入る。**公開リポジトリに機密を書かないため**。
 
-- **LUKS パスフレーズ**: `--passphrase` を指定していないので Anaconda が尋ねる
-- **ユーザーのパスワード**: `firstboot --reconfig` で初回起動時に設定する
+- **LUKS パスフレーズ**: `--passphrase` を書かないので Anaconda が尋ねる
+- **ユーザーのパスワード**: Plasma Setup で作る（`user --iscrypted` を使う場合は `.ks` 内コメント参照）
+- **Yubikey の登録**（`~/.config/Yubico/u2f_keys`）: 機器固有。`install.sh` が未登録なら案内を出す
 
-Kickstart で完結させたい場合は `.ks` 内のコメントに従って `user --iscrypted` を有効にする
-（生成したハッシュを公開リポジトリにコミットしないこと）。
+## 記録している設定（`install.sh` が復元するもの）
 
-## VM で検証する
+- `home/.config/kde-snapshot/`: パネル・ウィジェット・KWin・ショートカット・外観・入力・電源
+  （`kde-snapshot save` で更新。壁紙画像のパスは記録しない）
+- `flatpaks.txt` + `home/.local/share/flatpak/overrides/`
+- `packages.txt`（rpm-ostree レイヤ）、`fonts.txt`
+- `KDE_PACKAGES`（Monitor Align / Span Image / Krohnkite = GitHub Release）、`THEME_REPOS`（WhiteSur）
+- `system/authselect/yuya-auth/`（PAM: Yubikey → 指紋 → パスワード）
 
-実機の前に必ず VM で通すこと。
-
-```sh
-# 1) Kickstart を HTTP で配る（VM から見える IP を使う。libvirt の既定は 192.168.122.1）
-python3 -m http.server 8000 --directory ~/.dotfiles/bootstrap &
-
-# 2) VM を作る
-virt-install \
-  --name fedora-sway-ks-test \
-  --memory 4096 --vcpus 2 \
-  --disk size=40,format=qcow2 \
-  --cdrom ~/Downloads/Fedora-Sericea-ostree-x86_64-44-1.x.iso \
-  --os-variant fedora-rawhide \
-  --graphics spice
-```
-
-Atomic の ISO は Live 形式なので `--location` ではなく `--cdrom` を使う。
-起動メニューで `e`（または `Tab`）を押し、`linux` 行の末尾に次を追記する。
-
-```
-inst.ks=http://192.168.122.1:8000/fedora-sway-atomic.ks
-```
-
-`--location` が使える netinst 系 ISO なら `--extra-args "inst.ks=..."` で渡せる。
-
-### 確認すること
-
-1. `ostreesetup` の `--ref` が ISO の内容と一致しているか
-   （インストーラの `Ctrl+Alt+F2` で `ostree --repo=/ostree/repo refs`）
-2. LUKS パスフレーズのプロンプトが出て、暗号化されたディスクにインストールされるか
-3. 初回ログイン時に `/etc/profile.d/zz-dotfiles-hint.sh` の案内が出るか
-4. 案内通り `install.sh` を実行して、symlink・フォント・ユニットが揃うか
-
-## 構文チェック
+## 検証
 
 ```sh
-ksvalidator bootstrap/fedora-sway-atomic.ks   # pykickstart パッケージ
+ksvalidator bootstrap/fedora-kinoite.ks     # pykickstart（toolbox 内で dnf install pykickstart）
 ```
 
-## 将来: bootc / OSTree native container
+VM で通してから実機へ。VM は `virt-install --pxe --network bridge=...` で NAS の PXE に乗せるか、
+`--cdrom` の Kinoite ISO に `inst.ks=http://NAS/ks/fedora-kinoite.ks` を付ける。
+`ostreesetup --ref` は ISO のバージョンで変わるので、`pxe-boot/setup-iso.sh` の出力と合わせる。
 
-`Containerfile` でパッケージレイヤリングを OS イメージに焼き込めば、`install.sh` の
-レイヤリング工程（再起動を伴う）が不要になり、再構築が高速かつ再現的になる。
-`packages.txt` を `RUN dnf install` に変換する形にすれば定義を共有できる。
-詳細は `../CLAUDE.md` の「将来の方針」を参照。
-
-**Ignition は使えない** — Fedora CoreOS 専用で Silverblue/Sericea 系では利用できない。
+**Ignition は使えない** — Fedora CoreOS 専用。Kinoite は Kickstart。

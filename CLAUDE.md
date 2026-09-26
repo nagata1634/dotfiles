@@ -550,6 +550,33 @@ Firefox / plasmalogin / plasma-* はベースに含まれるため `packages.txt
 
 ---
 
+## 環境の再現（PXE → Kickstart → install.sh → kde-snapshot）
+
+2026-09-27 に「設定とウィジェットだけを記録し、データは復元しない」方針で再現経路を組んだ。
+全体像と手順は `bootstrap/README.md`、PXE サーバーは独立リポジトリ `nagata1634/pxe-boot`
+（QNAP NAS、dnsmasq の proxyDHCP でルータの DHCP を変えずに UEFI PXE を配る）。
+
+**KDE 設定は `kde-snapshot`（`home/.local/bin/`）で記録する**。`save` が `~/.config` の KDE rc 群
+（appletsrc / plasmashellrc / kwinrc / kwinoutputconfig.json / kglobalshortcutsrc / kdeglobals / 入力・
+電源・ロック等）を `home/.config/kde-snapshot/` にコピーし、壁紙画像のパス・`~/Pictures` 参照・
+Polonium 残骸を落とす。`restore` は plasmashell を止めてコピーし直す（symlink にしないのは KDE が
+実行中に書き換えるため。壁紙パスだけは実機の現在値を保持）。`diff` で「何を変えたか」を確認できる。
+**設定を変えたら `kde-snapshot save` → commit** が運用。`install.sh` は差分があるときだけ復元を尋ねる。
+ショートカット・仮想デスクトップ数・出力配置は KWin が起動時にしか読まない（罠5）ので、復元後は
+ログアウト→ログインで確定する。
+
+**記録しないもの（意図的）**: 壁紙画像、`~/Documents` 等のデータ（Pika Backup）、`~/.config/Yubico/
+u2f_keys`（機器固有）、kwallet/keyring の中身、`kactivitymanagerd-statsrc` 等の統計、Konsole 以外の
+アプリ内データ。
+
+**install.sh が担う残り**: Flatpak（`flatpaks.txt` + `home/.local/share/flatpak/overrides/`）、
+WhiteSur の Aurorae 装飾とアイコン（`THEME_REPOS`、各リポジトリの install.sh に任せる）、
+authselect の `custom/yuya-auth`（`system/authselect/`、pkexec で `/etc/authselect/custom/` に置く。
+これは authselect の正規の置き場で「/etc を手で編集しない」方針の例外ではない）、
+KDE 拡張（`KDE_PACKAGES`: Monitor Align / Span Image / Krohnkite）、user unit。
+
+---
+
 ## dotfiles の構造
 
 ```
@@ -557,7 +584,9 @@ Firefox / plasmalogin / plasma-* はベースに含まれるため `packages.txt
 ├── install.sh      curl 一発の入口（冪等・curl | bash 対応）
 ├── packages.txt    rpm-ostree レイヤリング対象
 ├── fonts.txt       Nerd Fonts の取得対象（フォント本体は含めない = clone を軽く保つ）
-├── bootstrap/      OS インストール層（Kickstart）
+├── bootstrap/      OS インストール層（Kickstart、PXE は nagata1634/pxe-boot）
+├── flatpaks.txt    Flatpak アプリ一覧
+├── system/         /etc 配下に置くもの（authselect プロファイル。install.sh が pkexec で配置）
 ├── CLAUDE.md       このファイル
 └── home/           ~/ にシンボリックリンクされる実体
 ```
