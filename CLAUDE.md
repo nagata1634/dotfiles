@@ -5,6 +5,8 @@ Sway(Sericea)から完全移行した（COSMICも試したが fcitx5 が動か�
 各設定ファイルには要点だけを書き、「なぜそうなっているか」はこのファイルに集約している。
 設定を変える前にここを読むこと。
 
+- **方針: 環境はできる限り標準のまま。必要な機能は自作を含めて外部（GitHub Releases / KDE Store /
+  Flatpak / rpm-ostree レイヤ最小）から導入し、`install.sh` 一発で新規マシンを再現できる状態を保つ**
 - 構成: **Plasma Login Manager(`plasmalogin`、KDE 標準・ベース同梱)** → `startplasma-wayland`、
   IME は fcitx5 + Mozc（KWin 起動）、
   タイル管理は Krohnkite（KWin スクリプト）
@@ -205,9 +207,12 @@ KWin には `Meta+Shift+#` として来る）ので、`Window to Desktop N` に�
 
 ## モニタ境界の縦オフセット調整（Monitor Align: 設定ページ ＋ monitoralign-daemon）
 
-**実体は独立リポジトリ `~/Documents/kwin-monitoralign`（GitHub: nagata1634/kwin-monitoralign、MIT、KDE Store: store.kde.org/p/2374311）**。
-2026-09-27 に dotfiles から分離し、KWin スクリプトとして公開する形にした。`install.sh` の
-`EXTERNAL_REPOS` が clone して `./install.sh --link` で symlink 導入する。以下は設計の「なぜ」の記録
+**実体は独立リポジトリ（GitHub: nagata1634/kwin-monitoralign、MIT、KDE Store: store.kde.org/p/2374311）**。
+2026-09-27 に dotfiles から分離し、KWin スクリプトとして公開した。**実機も一般ユーザーと同じ経路で
+導入する**: `install.sh` の `KDE_PACKAGES` が GitHub Releases の `.kwinscript`（KDE Store と同一物）を
+`kpackagetool6 -i/-u` で入れ、同梱の `contents/install-daemon.sh` でデーモンを有効化する。
+開発用 checkout（`~/Documents/kwin-monitoralign`）は開発時だけ `./install.sh --link` で切り替え、
+終わったら `install.sh` を流して公開物に戻す。以下は設計の「なぜ」の記録
 （コードの正は向こうのリポジトリ）。
 
 **目的**: 横に並べたモニタの上下のズレ（台座・アームの高さ差で数百px単位で出る）を
@@ -554,8 +559,8 @@ KDE 固有の外観資産（`~/.local/share/color-schemes/Solarized*`、`~/.loca
 dev.yuya.solarized.*`）も同様にファイル単位で `LINK_FILES` に登録して symlink している。
 **自作の KDE 拡張のうち公開しているもの（Monitor Align = `nagata1634/kwin-monitoralign`、
 Span Image 壁紙 = `nagata1634/plasma-spanimage`、GPL-2.0-or-later）は独立リポジトリ**で、
-`install.sh` の `EXTERNAL_REPOS` が `~/Documents/` に clone して各リポジトリの `install.sh --link`
-で導入する（開発はそのリポジトリで行い、dotfiles には含めない）。`kwinrc` / `kglobalshortcutsrc` 等の頻繁に
+`install.sh` の `KDE_PACKAGES` が GitHub Releases のアーカイブ（KDE Store と同一物）を `kpackagetool6` で
+導入する（開発はそのリポジトリで行い、dotfiles には含めない）。`kwinrc` / `kglobalshortcutsrc` 等の頻繁に
 GUI から書き換わる設定ファイル自体は dotfiles 管理下に**入れていない**（意図的な選択）。
 
 **`install.sh` の要点**

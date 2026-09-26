@@ -69,8 +69,8 @@ LINK_FILES=(
   ".local/share/color-schemes/SolarizedDark.colors"
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.light"
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.dark"
-  # ※ Monitor Align(KWin スクリプト)と Span Image(壁紙プラグイン)は独立リポジトリ。
-  #   EXTERNAL_REPOS で clone し、各リポジトリの install.sh --link で導入する。
+  # ※ Monitor Align(KWin スクリプト)と Span Image(壁紙プラグイン)は独立リポジトリで公開しており、
+  #   KDE_PACKAGES が GitHub Releases のアーカイブ(= KDE Store と同一物)を kpackagetool6 で導入する。
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/60-editor.sh"
@@ -84,8 +84,12 @@ LINK_FILES=(
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
 ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service)
 
-# 自作の KDE 拡張で、独立リポジトリとして公開しているもの（~/Documents に clone、--link で導入）
-EXTERNAL_REPOS=(nagata1634/kwin-monitoralign nagata1634/plasma-spanimage)
+# 自作の KDE 拡張。公開物(GitHub Releases / KDE Store)を一般ユーザーと同じ経路で導入する。
+# 書式: "<GitHub repo>|<KPackage type>|<package id>|<asset の末尾>|<導入後に実行する package 内スクリプト(任意)>"
+KDE_PACKAGES=(
+  "nagata1634/kwin-monitoralign|KWin/Script|monitoralign|.kwinscript|contents/install-daemon.sh"
+  "nagata1634/plasma-spanimage|Plasma/Wallpaper|dev.yuya.spanimage|.wallpaper.zip|"
+)
 
 PROFILE_BEGIN="# >>> dotfiles: profile >>>"
 PROFILE_END="# <<< dotfiles: profile <<<"
@@ -328,18 +332,30 @@ EOF
   c_ok "~/.bash_profile に ~/.profile の読み込みを追加しました"
 }
 
-# ----- 5b. 独立リポジトリの KDE 拡張 -------------------------------------
-install_external_repos() {
-  command -v kpackagetool6 >/dev/null 2>&1 || { c_warn "KDE 環境ではないため独立リポジトリの導入をスキップ"; return 0; }
-  local repo dir
-  for repo in "${EXTERNAL_REPOS[@]}"; do
-    dir="$HOME/Documents/${repo##*/}"
-    if [ -d "$dir/.git" ]; then
-      git -C "$dir" pull -q --ff-only 2>/dev/null || c_warn "$repo: pull できませんでした（ローカル変更あり？）"
+# ----- 5b. 自作 KDE 拡張（GitHub Releases から kpackagetool6 で導入）--------------
+# 「環境は標準のまま、必要な機能は外部から入れる」方針。開発用 checkout(~/Documents)は使わず、
+# KDE Store に置いたものと同じアーカイブを最新リリースから取って入れる（冪等: 導入済みなら upgrade）。
+install_kde_packages() {
+  command -v kpackagetool6 >/dev/null 2>&1 || { c_warn "KDE 環境ではないため自作 KDE 拡張の導入をスキップ"; return 0; }
+  local spec repo type id suffix post url tmp
+  for spec in "${KDE_PACKAGES[@]}"; do
+    IFS='|' read -r repo type id suffix post <<<"$spec"
+    url="$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
+           | grep -oE '"browser_download_url": *"[^"]+'"$suffix"'"' | head -1 | cut -d'"' -f4)" || url=""
+    [ -n "$url" ] || { c_warn "$repo: リリースのアーカイブが見つかりません（スキップ）"; continue; }
+    tmp="$(mktemp -d)"
+    curl -fsSL "$url" -o "$tmp/pkg$suffix" || { rm -rf "$tmp"; c_warn "$repo: 取得に失敗"; continue; }
+    if kpackagetool6 -t "$type" -s "$id" 2>/dev/null | grep -q "Path *: *."; then
+      kpackagetool6 -t "$type" -u "$tmp/pkg$suffix" >/dev/null && c_ok "更新: $id ($(basename "$url"))"
     else
-      git clone -q "https://github.com/$repo.git" "$dir" || { c_warn "$repo: clone に失敗"; continue; }
+      kpackagetool6 -t "$type" -i "$tmp/pkg$suffix" >/dev/null && c_ok "導入: $id ($(basename "$url"))"
     fi
-    if "$dir/install.sh" --link >/dev/null; then c_ok "導入: $repo (--link)"; else c_warn "$repo: install.sh --link が失敗"; fi
+    rm -rf "$tmp"
+    if [ -n "$post" ]; then
+      local dir
+      dir="$(kpackagetool6 -t "$type" -s "$id" 2>/dev/null | grep -oE 'Path *: *.*' | sed 's/Path *: *//')"
+      [ -x "$dir/$post" ] && { "$dir/$post" >/dev/null && c_ok "$id: $post 実行"; } || c_warn "$id: $post が無い/実行不可"
+    fi
   done
 }
 
@@ -369,7 +385,7 @@ if [ "$SKIP_FONTS" -eq 0 ]; then c_info "=== 3/5 フォント ==="; install_font
 else c_warn "=== 3/5 フォント === スキップ"; fi
 install_compose
 c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block
-c_info "=== 5/5 サービス ==="; enable_units; install_external_repos
+c_info "=== 5/5 サービス ==="; enable_units; install_kde_packages
 
 echo
 c_ok "セットアップ完了。"
