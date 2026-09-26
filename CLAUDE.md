@@ -196,6 +196,11 @@ KWin スクリプト）を導入。2026-09-07 に一度設定したが、**2026-
 
 ## モニタ境界の縦オフセット調整（Monitor Align: 設定ページ ＋ monitoralign-daemon）
 
+**実体は独立リポジトリ `~/Documents/kwin-monitoralign`（GitHub: nagata1634/kwin-monitoralign、MIT）**。
+2026-09-27 に dotfiles から分離し、KWin スクリプトとして公開する形にした。`install.sh` の
+`EXTERNAL_REPOS` が clone して `./install.sh --link` で symlink 導入する。以下は設計の「なぜ」の記録
+（コードの正は向こうのリポジトリ）。
+
 **目的**: 横に並べたモニタの上下のズレ（台座・アームの高さ差で数百px単位で出る）を
 合わせ、**境界をまたぐときにカーソルが飛ばない**ようにする。Sway 時代の
 `settings-menu.sh`「境界の高さ調整」（+50/-50 で少しずつ動かして目で確認、コミット
@@ -536,10 +541,12 @@ Firefox / plasmalogin / plasma-* はベースに含まれるため `packages.txt
 
 `~/.config/fcitx5` などは `~/.dotfiles/home/.config/fcitx5` への symlink になっている。
 つまり**設定を編集すればそのままリポジトリの変更になる**（手動コピーは不要）。
-KDE 固有の外観資産（`~/.local/share/plasma/wallpapers/dev.yuya.spanimage`、
-`~/.local/share/color-schemes/Solarized*`、`~/.local/share/plasma/look-and-feel/
-dev.yuya.solarized.*`、`~/.local/bin/monitoralign-daemon`）も同様にファイル単位で
-`LINK_FILES` に登録して symlink している。`kwinrc` / `kglobalshortcutsrc` 等の頻繁に
+KDE 固有の外観資産（`~/.local/share/color-schemes/Solarized*`、`~/.local/share/plasma/look-and-feel/
+dev.yuya.solarized.*`）も同様にファイル単位で `LINK_FILES` に登録して symlink している。
+**自作の KDE 拡張のうち公開しているもの（Monitor Align = `nagata1634/kwin-monitoralign`、
+Span Image 壁紙 = `nagata1634/plasma-spanimage`、GPL-2.0-or-later）は独立リポジトリ**で、
+`install.sh` の `EXTERNAL_REPOS` が `~/Documents/` に clone して各リポジトリの `install.sh --link`
+で導入する（開発はそのリポジトリで行い、dotfiles には含めない）。`kwinrc` / `kglobalshortcutsrc` 等の頻繁に
 GUI から書き換わる設定ファイル自体は dotfiles 管理下に**入れていない**（意図的な選択）。
 
 **`install.sh` の要点**

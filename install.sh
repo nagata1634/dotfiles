@@ -57,9 +57,6 @@ LINK_FILES=(
   ".config/systemd/user/sway-logout.service"
   # ログイン後に Magic Trackpad の入力を入れ直す（環境固有だが害は無いので含める）
   ".config/systemd/user/sway-trackpad-reset.service"
-  # KDE Plasma 用の自作外観一式。
-  # 壁紙を複数モニタにまたがって表示するプラグイン（Plasma 本体に span 機能が無いため）。
-  ".local/share/plasma/wallpapers/dev.yuya.spanimage"
   # 蓋を閉じた状態でアンロックすると内蔵ディスプレイが復活する
   # kscreenlockerの不具合対策（bugs.kde.org #363238 等と同系統）。
   ".config/kde-scripts/lid-unlock-output-fix.sh"
@@ -72,12 +69,8 @@ LINK_FILES=(
   ".local/share/color-schemes/SolarizedDark.colors"
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.light"
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.dark"
-  # モニタ境界の縦オフセット調整。System Settings › KWin スクリプト › Monitor Align の
-  # 設定ページ(器だけ。中身は空)で ±10 した値を、常駐の monitoralign-daemon が
-  # 全モニタ横一列・隙間なしの配置として kscreen-doctor に適用する。
-  ".local/share/kwin/scripts/monitoralign"
-  ".local/bin/monitoralign-daemon"
-  ".config/systemd/user/monitoralign.service"
+  # ※ Monitor Align(KWin スクリプト)と Span Image(壁紙プラグイン)は独立リポジトリ。
+  #   EXTERNAL_REPOS で clone し、各リポジトリの install.sh --link で導入する。
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/60-editor.sh"
@@ -89,7 +82,10 @@ LINK_FILES=(
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
-ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service)
+ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service)
+
+# 自作の KDE 拡張で、独立リポジトリとして公開しているもの（~/Documents に clone、--link で導入）
+EXTERNAL_REPOS=(nagata1634/kwin-monitoralign nagata1634/plasma-spanimage)
 
 PROFILE_BEGIN="# >>> dotfiles: profile >>>"
 PROFILE_END="# <<< dotfiles: profile <<<"
@@ -332,6 +328,21 @@ EOF
   c_ok "~/.bash_profile に ~/.profile の読み込みを追加しました"
 }
 
+# ----- 5b. 独立リポジトリの KDE 拡張 -------------------------------------
+install_external_repos() {
+  command -v kpackagetool6 >/dev/null 2>&1 || { c_warn "KDE 環境ではないため独立リポジトリの導入をスキップ"; return 0; }
+  local repo dir
+  for repo in "${EXTERNAL_REPOS[@]}"; do
+    dir="$HOME/Documents/${repo##*/}"
+    if [ -d "$dir/.git" ]; then
+      git -C "$dir" pull -q --ff-only 2>/dev/null || c_warn "$repo: pull できませんでした（ローカル変更あり？）"
+    else
+      git clone -q "https://github.com/$repo.git" "$dir" || { c_warn "$repo: clone に失敗"; continue; }
+    fi
+    if "$dir/install.sh" --link >/dev/null; then c_ok "導入: $repo (--link)"; else c_warn "$repo: install.sh --link が失敗"; fi
+  done
+}
+
 # ----- 6. systemd --user ユニット ---------------------------------------
 enable_units() {
   command -v systemctl >/dev/null 2>&1 || { c_warn "systemctl が無いためスキップ"; return 0; }
@@ -358,7 +369,7 @@ if [ "$SKIP_FONTS" -eq 0 ]; then c_info "=== 3/5 フォント ==="; install_font
 else c_warn "=== 3/5 フォント === スキップ"; fi
 install_compose
 c_info "=== 4/5 設定の配置 ==="; deploy; install_bash_profile_block
-c_info "=== 5/5 サービス ==="; enable_units
+c_info "=== 5/5 サービス ==="; enable_units; install_external_repos
 
 echo
 c_ok "セットアップ完了。"

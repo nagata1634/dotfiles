@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MonitorAlignConfigForm</class>
+ <widget class="QWidget" name="MonitorAlignConfigForm">
+  <layout class="QVBoxLayout" name="v">
+   <item><widget class="QLabel" name="helpLabel"><property name="wordWrap"><bool>true</bool></property><property name="text"><string>Primary（KDE の「ディスプレイの設定」で決めたもの）を基準に、他のモニタを Primary より何 px 下に置くか（負 = 上へ）をスライダーか数値欄で決め、[適用] で反映します。境界をまたいでカーソルを横に動かし、飛ばなくなる所を探してください。隣へ移ったときカーソルが実際より上に出る → 出発側を下へ（値を増やす）、下に出る → 上へ。
+
+並びは左から下記の順（内蔵パネル → 外部の接続名順）で横一列・隙間なし。横方向は自動なので間隔が空くことはなく、隣と縦に重ならない値は自動で補正されます。</string></property></widget></item>
+   <item alignment="Qt::AlignHCenter"><widget class="QLabel" name="l0"><property name="text"><string>1. DP-5　横置き 2560×1440　—　基準（Primary） 0 px</string></property></widget></item>
+   <item alignment="Qt::AlignHCenter"><widget class="QLabel" name="l1"><property name="text"><string>2. DP-6　縦置き 1440×2560</string></property></widget></item>
+   <item alignment="Qt::AlignHCenter"><widget class="QSlider" name="slider_1"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="minimumWidth"><number>480</number></property><property name="minimum"><number>-1969</number></property><property name="maximum"><number>1969</number></property><property name="singleStep"><number>10</number></property><property name="pageStep"><number>50</number></property><property name="tickPosition"><enum>QSlider::TicksBelow</enum></property><property name="tickInterval"><number>100</number></property></widget></item>
+   <item alignment="Qt::AlignHCenter"><layout class="QHBoxLayout" name="h1">
+      <item><widget class="QToolButton" name="m10_1"><property name="text"><string>−10</string></property><property name="autoRepeat"><bool>true</bool></property></widget></item>
+      <item><widget class="QToolButton" name="m1_1"><property name="text"><string>−1</string></property><property name="autoRepeat"><bool>true</bool></property></widget></item>
+      <item><widget class="QSpinBox" name="kcfg_y_DP_6"><property name="prefix"><string>DP-5 より </string></property><property name="suffix"><string> px 下へ</string></property><property name="minimum"><number>-1969</number></property><property name="maximum"><number>1969</number></property><property name="singleStep"><number>10</number></property></widget></item>
+      <item><widget class="QToolButton" name="p1_1"><property name="text"><string>+1</string></property><property name="autoRepeat"><bool>true</bool></property></widget></item>
+      <item><widget class="QToolButton" name="p10_1"><property name="text"><string>+10</string></property><property name="autoRepeat"><bool>true</bool></property></widget></item>
+      <item><widget class="QSpinBox" name="fine_1"><property name="maximumSize"><size><width>0</width><height>0</height></size></property><property name="minimum"><number>-1969</number></property><property name="maximum"><number>1969</number></property><property name="singleStep"><number>1</number></property></widget></item>
+   </layout></item>
+   <item><spacer name="gap1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint"><size><width>0</width><height>12</height></size></property></spacer></item>
+   <item><spacer name="s"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection><sender>slider_1</sender><signal>valueChanged(int)</signal><receiver>kcfg_y_DP_6</receiver><slot>setValue(int)</slot></connection>
+  <connection><sender>kcfg_y_DP_6</sender><signal>valueChanged(int)</signal><receiver>slider_1</receiver><slot>setValue(int)</slot></connection>
+  <connection><sender>fine_1</sender><signal>valueChanged(int)</signal><receiver>kcfg_y_DP_6</receiver><slot>setValue(int)</slot></connection>
+  <connection><sender>kcfg_y_DP_6</sender><signal>valueChanged(int)</signal><receiver>fine_1</receiver><slot>setValue(int)</slot></connection>
+  <connection><sender>m10_1</sender><signal>clicked()</signal><receiver>kcfg_y_DP_6</receiver><slot>stepDown()</slot></connection>
+  <connection><sender>p10_1</sender><signal>clicked()</signal><receiver>kcfg_y_DP_6</receiver><slot>stepUp()</slot></connection>
+  <connection><sender>m1_1</sender><signal>clicked()</signal><receiver>fine_1</receiver><slot>stepDown()</slot></connection>
+  <connection><sender>p1_1</sender><signal>clicked()</signal><receiver>fine_1</receiver><slot>stepUp()</slot></connection>
+ </connections>
+</ui>
