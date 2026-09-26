@@ -536,6 +536,15 @@ Firefox / plasmalogin / plasma-* はベースに含まれるため `packages.txt
 
 **Firefox は消さない**: Brave が落ちたときの最後の手段として、プロファイルごと残す。
 
+**Flatpak の日本語が豆腐になる（freedesktop 26.08 ランタイム）**: Obsidian（`md.obsidian.Obsidian`）で
+発生。ランタイム 26.08 の fontconfig 2.18 が `/run/host/fonts`（ホストのフォント）を走査せず、
+サンドボックス内に CJK フォントが無い扱いになる（同じホストで GNOME 50 ランタイムの Rnote は正常）。
+切り分けは `flatpak run --command=fc-list <app> :lang=ja` が空かどうか。対処はアプリ単位の
+`~/.var/app/<app>/config/fontconfig/fonts.conf` に `<dir>/run/host/fonts</dir>` と
+`<dir>/run/host/user-fonts</dir>` を書き、`<alias><family>sans-serif</family><accept>Noto Sans CJK JP`
+で JP 字形を優先（無指定だと KR が選ばれる）。ホストの `~/.config/fontconfig` は触らない。
+同じランタイムの他アプリでも再発しうるので、新しい Flatpak で豆腐が出たらまずこれを疑う。
+
 **Flatpak** は自由に削除できる。`flatpak uninstall --delete-data <id>` を1件ずつ実行し、
 最後に `flatpak uninstall --unused` で孤立ランタイムを回収する。
 
