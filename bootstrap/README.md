@@ -28,8 +28,23 @@
 
 NAS への sshfs は SSH 鍵が要り、鍵はバックアップの中、バックアップは NAS の中——という循環を、
 **Yubikey の resident key**（秘密をどこにも保存しない。`ssh-keygen -K` で再生成）で断つ。日常は従来の
-ed25519 鍵（Bitwarden に控え）。NAS の `authorized_keys` には 2 本登録し、`~/.ssh/config` と
-`qnap-tpbk.service` は両方の `IdentityFile` を指す（無い方は無視される）。
+ed25519 鍵（Bitwarden に控え）。Yubikey は 2 本あるので resident key も 2 本（`~/.ssh/yuuya-nas-sk` / `yuuya-nas-sk2`、`-O application=ssh:qnap`）。
+NAS の `authorized_keys` には既存 ed25519 と合わせて 3 本登録し、`~/.ssh/config` と `qnap-tpbk.service` は
+3 本の `IdentityFile` を指す（無い方は無視される）。
+
+再構築後の復元手順（どちらか 1 本を挿す）:
+
+```sh
+cd ~/.ssh && ssh-keygen -K                      # PIN + タッチ。id_ed25519_sk_rk_ssh_qnap(.pub) が生成される
+mv id_ed25519_sk_rk_ssh_qnap     yuuya-nas-sk   # 2 本目なら yuuya-nas-sk2（どちらの名前でも config が拾う）
+mv id_ed25519_sk_rk_ssh_qnap.pub yuuya-nas-sk.pub
+ssh -o IdentitiesOnly=yes -i ~/.ssh/yuuya-nas-sk qnap-yuuya true && echo OK
+```
+
+LUKS（`/dev/nvme0n1p3`）も keyslot 0 = パスフレーズ、1 と 2 = Yubikey 各 1 本（`systemd-cryptenroll
+--fido2-device=auto`）。PAM（`~/.config/Yubico/u2f_keys`）も 2 本登録済み。**再構築後は PAM だけ登録し直す**
+（`pamu2fcfg > ~/.config/Yubico/u2f_keys`、2 本目は `pamu2fcfg -n >> …`）。LUKS は Kickstart でディスクを
+作り直すので、インストール後に `systemd-cryptenroll` を 2 本ぶん実行する。
 
 Atomic の Kickstart `%post` はイメージが deploy された直後の状態しか触れず、**`rpm-ostree` による
 レイヤリングができない**。`systemd --user` も動いていない。よって `%post` はヒントを置くだけ。

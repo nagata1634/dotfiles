@@ -11,7 +11,7 @@ ExecStartPre=/usr/bin/mkdir -p %h/mnt/qnap-tpbk
 ExecStart=/usr/bin/sshfs -f \
   -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,idmap=user \
   -o follow_symlinks,allow_other,kernel_cache,cache=yes \
-  -o IdentityFile=%h/.ssh/yuuya-nas -o IdentityFile=%h/.ssh/yuuya-nas-sk \
+  -o IdentityFile=%h/.ssh/yuuya-nas -o IdentityFile=%h/.ssh/yuuya-nas-sk -o IdentityFile=%h/.ssh/yuuya-nas-sk2 \
   -o StrictHostKeyChecking=accept-new \
   qnap-yuuya:/share/CACHEDEV2_DATA/TPBK %h/mnt/qnap-tpbk
 
