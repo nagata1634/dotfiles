@@ -205,7 +205,7 @@ KWin には `Meta+Shift+#` として来る）ので、`Window to Desktop N` に�
 
 ## モニタ境界の縦オフセット調整（Monitor Align: 設定ページ ＋ monitoralign-daemon）
 
-**実体は独立リポジトリ `~/Documents/kwin-monitoralign`（GitHub: nagata1634/kwin-monitoralign、MIT）**。
+**実体は独立リポジトリ `~/Documents/kwin-monitoralign`（GitHub: nagata1634/kwin-monitoralign、MIT、KDE Store: store.kde.org/p/2374311）**。
 2026-09-27 に dotfiles から分離し、KWin スクリプトとして公開する形にした。`install.sh` の
 `EXTERNAL_REPOS` が clone して `./install.sh --link` で symlink 導入する。以下は設計の「なぜ」の記録
 （コードの正は向こうのリポジトリ）。
