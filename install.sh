@@ -69,6 +69,12 @@ LINK_FILES=(
   ".local/share/color-schemes/SolarizedDark.colors"
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.light"
   ".local/share/plasma/look-and-feel/dev.yuya.solarized.dark"
+  # モニタ境界の縦オフセット調整。System Settings › KWin スクリプト › Monitor Align の
+  # 設定ページ(器だけ。中身は空)で ±10 した値を、常駐の monitoralign-daemon が
+  # 全モニタ横一列・隙間なしの配置として kscreen-doctor に適用する。
+  ".local/share/kwin/scripts/monitoralign"
+  ".local/bin/monitoralign-daemon"
+  ".config/systemd/user/monitoralign.service"
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/60-editor.sh"
@@ -80,7 +86,7 @@ LINK_FILES=(
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
-ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service)
+ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service)
 
 PROFILE_BEGIN="# >>> dotfiles: profile >>>"
 PROFILE_END="# <<< dotfiles: profile <<<"

@@ -1,0 +1,16 @@
+[Unit]
+Description=モニタを横一列・隙間なしに並べ、System Settings(KWin スクリプト Monitor Align)の縦オフセットを適用する
+PartOf=plasma-workspace.target
+# KWin 起動直後(1〜2秒)に kscreen-doctor で出力配置を変えると KWin が DrmGpu::pageFlipHandler で
+# SIGSEGV したことがある(2026-09-27、plasmalogin 初回起動時)。デスクトップが出揃ってから動く。
+After=plasma-kwin_wayland.service plasma-plasmashell.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/sleep 15
+ExecStart=%h/.local/bin/monitoralign-daemon
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=plasma-workspace.target

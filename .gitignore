@@ -21,3 +21,6 @@ home/.config/sway/scripts/pika-repoint.py
 
 # install.sh が作る退避ファイル
 *.bak.[0-9]*
+# monitoralign-daemon が接続中のモニタから生成する(静的に持たない)
+home/.local/share/kwin/scripts/monitoralign/contents/config/main.xml
+home/.local/share/kwin/scripts/monitoralign/contents/ui/config.ui

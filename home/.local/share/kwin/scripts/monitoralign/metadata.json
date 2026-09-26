@@ -1,0 +1,16 @@
+{
+  "KPackageStructure": "KWin/Script",
+  "KPlugin": {
+    "Name": "Monitor Align",
+    "Description": "モニタ境界の縦オフセットを System Settings から ±10 で調整する(実体は monitoralign-daemon)",
+    "Icon": "preferences-desktop-display",
+    "Authors": [{ "Name": "yuya" }],
+    "Id": "monitoralign",
+    "Version": "1.0",
+    "License": "MIT"
+  },
+  "X-Plasma-API": "javascript",
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "X-Plasma-MainScript": "code/main.js",
+  "X-KDE-ConfigModule": "kwin/effects/configs/kcm_kwin4_genericscripted"
+}
