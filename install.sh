@@ -63,6 +63,9 @@ LINK_FILES=(
   # 蓋を閉じた状態でアンロックすると内蔵ディスプレイが復活する
   # kscreenlockerの不具合対策（bugs.kde.org #363238 等と同系統）。
   ".config/kde-scripts/lid-unlock-output-fix.sh"
+  # DP-8 パネルの System Monitor Sensor 4つ(Disks/メモリ/CPU/ネットワーク)を Plasma の
+  # scripting API で設定するスクリプト(手動実行。applet id は環境固有、ファイル冒頭参照)。
+  ".config/kde-scripts/panel-sensors.js"
   ".config/systemd/user/kde-lid-unlock-fix.service"
   # Solarized の配色と、それを使うグローバルテーマ（日の出/日の入り連動切替の対象）。
   ".local/share/color-schemes/SolarizedLight.colors"
