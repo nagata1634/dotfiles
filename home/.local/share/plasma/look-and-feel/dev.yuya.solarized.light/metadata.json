@@ -1,0 +1,12 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [{ "Name": "yuya" }],
+        "Category": "",
+        "Description": "Solarized (Ethan Schoonover) 配色。日の出/日の入り連動切替用に自作。",
+        "Id": "dev.yuya.solarized.light",
+        "License": "MIT",
+        "Name": "Solarized Light",
+        "Version": "1.0"
+    }
+}

@@ -1,0 +1,12 @@
+[Unit]
+Description=蓋を閉じた状態でのアンロック時、内蔵ディスプレイを無効化し直す(KDE Plasmaのkscreenlockerバグ対策)
+PartOf=plasma-workspace.target
+
+[Service]
+Type=simple
+ExecStart=%h/.config/kde-scripts/lid-unlock-output-fix.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=plasma-workspace.target

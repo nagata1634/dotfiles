@@ -57,6 +57,18 @@ LINK_FILES=(
   ".config/systemd/user/sway-logout.service"
   # ログイン後に Magic Trackpad の入力を入れ直す（環境固有だが害は無いので含める）
   ".config/systemd/user/sway-trackpad-reset.service"
+  # KDE Plasma 用の自作外観一式。
+  # 壁紙を複数モニタにまたがって表示するプラグイン（Plasma 本体に span 機能が無いため）。
+  ".local/share/plasma/wallpapers/dev.yuya.spanimage"
+  # 蓋を閉じた状態でアンロックすると内蔵ディスプレイが復活する
+  # kscreenlockerの不具合対策（bugs.kde.org #363238 等と同系統）。
+  ".config/kde-scripts/lid-unlock-output-fix.sh"
+  ".config/systemd/user/kde-lid-unlock-fix.service"
+  # Solarized の配色と、それを使うグローバルテーマ（日の出/日の入り連動切替の対象）。
+  ".local/share/color-schemes/SolarizedLight.colors"
+  ".local/share/color-schemes/SolarizedDark.colors"
+  ".local/share/plasma/look-and-feel/dev.yuya.solarized.light"
+  ".local/share/plasma/look-and-feel/dev.yuya.solarized.dark"
   ".bashrc"
   ".bashrc.d/50-aliases.sh"
   ".bashrc.d/60-editor.sh"
@@ -68,7 +80,7 @@ LINK_FILES=(
 # （bitwarden.sh など）が消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
-ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket)
+ENABLE_UNITS=(waybar.service swayidle.service sway-trackpad-reset.service ssh-agent.socket kde-lid-unlock-fix.service)
 
 PROFILE_BEGIN="# >>> dotfiles: profile >>>"
 PROFILE_END="# <<< dotfiles: profile <<<"

@@ -1,0 +1,24 @@
+# 配色は Solarized のまま、見た目の骨格だけ WhiteSur(macOS Big Sur 風)にする構成。
+# Kvantum は入れていない: Qt アプリの配色ごと WhiteSur のパレットに置き換わり、
+# 「Solarized を維持する」方針と衝突するため。widgetStyle は Breeze のまま。
+# 壁紙と ksplashrc は意図的に書かない（昼夜の切替のたびに壁紙が飛ぶのを防ぐ）。
+# WhiteSur 本体は dotfiles に含めない。再構築は下記で行う:
+#   git clone --depth 1 https://github.com/vinceliuice/WhiteSur-kde && ./WhiteSur-kde/install.sh
+[kdeglobals][KDE]
+widgetStyle=Breeze
+
+[kdeglobals][General]
+ColorScheme=SolarizedLight
+
+[kdeglobals][Icons]
+Theme=breeze
+
+[plasmarc][Theme]
+name=WhiteSur
+
+[kcminputrc][Mouse]
+cursorTheme=breeze_cursors
+
+[kwinrc][org.kde.kdecoration2]
+library=org.kde.kwin.aurorae
+theme=__aurorae__svg__WhiteSur

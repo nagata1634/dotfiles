@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+  <group name="General">
+    <!-- キー名は org.kde.image に合わせてある。設定 UI のサムネイル一覧・
+         デリゲートをそのまま流用しており、それらが cfg_Image / cfg_Color /
+         cfg_FillMode / cfg_Blur を直に参照するため。 -->
+    <entry name="Image" type="String">
+      <label>表示する画像のパス</label>
+      <default></default>
+    </entry>
+    <entry name="PreviewImage" type="String">
+      <label>設定ダイアログ表示中のプレビュー用（保存されない）</label>
+      <default>null</default>
+    </entry>
+    <entry name="Color" type="Color">
+      <label>余白の色</label>
+      <default>#002b36</default>
+    </entry>
+    <entry name="FillMode" type="int">
+      <label>サムネイルの表示方法（本体は常に全画面カバー）</label>
+      <default>2</default>
+    </entry>
+    <entry name="Blur" type="bool">
+      <label>サムネイルの背景をぼかす</label>
+      <default>false</default>
+    </entry>
+  </group>
+</kcfg>
