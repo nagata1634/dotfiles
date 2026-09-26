@@ -12,8 +12,9 @@ Sway(Sericea)から完全移行した（COSMICも試したが fcitx5 が動か�
   詳細は後述「蓋を閉じたときの挙動」）
 - ランチャーは KRunner（Meta+Space）、ターミナルは Konsole/foot、ブラウザは Brave(Flatpak)
 - `/var/home` は LUKS 上の btrfs（ディスク全体が暗号化済み）
-- **Sericea(Sway) デプロイメントは切り戻し用に `rpm-ostree` で pin したまま残してある**。
-  日常使いはしない。詳細は末尾「旧構成: Sway(Sericea) への切り戻し」
+- **Sericea(Sway) デプロイメントは 2026-09-27 に削除済み**（pin 解除 → undeploy）。
+  Kinoite のみで運用し、rpm-ostree のデプロイメントは「現在 + 1 つ前」だけ。
+  詳細は末尾「旧構成: Sway(Sericea)」
 
 ---
 
@@ -582,23 +583,19 @@ GUI から書き換わる設定ファイル自体は dotfiles 管理下に**入�
 
 ---
 
-## 旧構成: Sway(Sericea) への切り戻し
+## 旧構成: Sway(Sericea)
 
-`rpm-ostree status` で `sericea` デプロイメントが `Pinned: yes` のまま残っている。
-何らかの理由で Kinoite が使えなくなった場合の保険。
+2026-09-27、Kinoite への完全移行が確定したため **Sericea デプロイメントは削除した**
+（`ostree admin pin --unpin` → `ostree admin undeploy`）。以後、Sway 環境への切り戻し手段は
+無く、rpm-ostree のデプロイメントは「現在 + rollback（1 つ前の Kinoite）」の 2 本だけを保つ。
 
-- 切り戻し手順: `rpm-ostree status` で sericea の index を確認し
-  `rpm-ostree rollback` または `ostree admin deploy` で該当コミットを起動対象にする
-  （**破壊的操作なので実行前に必ず現在の作業を確認・確定させること**）
 - Sway 側の dotfiles 資産（`config/sway`, `rofi`, `waybar`, `dunst`, `foot`,
-  `install.sh --minimal` オプション等）は削除せずそのまま残してある。
-  Sericea で起動すれば従来どおり動くはず（Kinoite 移行後は未検証）
-- `packages.txt` は Kinoite 前提に書き換え済みのため、Sericea へ切り戻した場合は
-  `rofi`/`waybar`/`dunst`/`swayidle`/`grim`/`slurp` 等が「ベース同梱」に戻るので
-  問題なし。逆に `foot`/`kvantum`/`fcitx5-qt6` は Sericea では不要だが害もない
-
-**将来の判断が必要な点**: Sericea をいつまで保持するか、Sway 側の dotfiles を
-いつメンテナンス対象から外すかは未決定。
+  `install.sh --minimal` オプション等）は git 履歴と現行ツリーに残っているが、
+  **メンテナンス対象外**。再び Sway を使う場合は Sericea を新規インストールして
+  `install.sh` を流す（当時の動作は Kinoite 移行後に未検証）
+- `install.sh` の `ENABLE_UNITS` に残る `waybar.service` 等の Sway 用ユニットは、
+  Kinoite では unit が無いため `c_warn` でスキップされるだけ（クリーンアップ候補）
+- `consoleblank=300` カーネル引数（tuigreet の消灯用）も同日に削除
 
 ---
 
