@@ -11,7 +11,6 @@
 #   - LUKS パスフレーズは指定せず、インストール中に対話で入力する
 #   - ユーザーのパスワードも書かず、初回起動のセットアップ（plasma-setup）に任せる
 #
-# NAS_HOST は PXE サーバー（pxe-boot リポジトリ）のホスト名/IP に置き換える。
 # 検証: ksvalidator bootstrap/fedora-kinoite.ks
 
 # ----- 基本 -------------------------------------------------------------
@@ -41,11 +40,13 @@ clearpart --all --initlabel --disklabel=gpt
 autopart --type=btrfs --encrypted --luks-version=luks2
 
 # ----- インストールソース（ostree）----------------------------------------
-# PXE サーバーに展開した Kinoite ISO の ostree リポジトリから入れる（LAN 内で完結、高速）。
-# ref は ISO のバージョンで変わる: インストーラの shell（Ctrl+Alt+F2）で
-#   ostree --repo=/run/install/repo/ostree/repo refs
-ostreesetup --osname="fedora" --remote="fedora" --url="http://NAS_HOST/kinoite/ostree/repo" --ref="fedora/44/x86_64/kinoite" --nogpg
-# NAS が無い場合の代替（インターネット経由、遅い）:
+# Kinoite の ISO は ostree リポジトリを ISO ルートではなく **images/install.img（stage2 の rootfs）の
+# /ostree/repo に持つ**（ISO 同梱の interactive-defaults.ks と同じ指定）。PXE では inst.stage2 で
+# install.img を NAS から取るので、インストーラ内では file:///ostree/repo として見える。
+# ref は ISO のバージョンで変わる: pxe-boot/setup-iso.sh の出力、または
+#   7z l images/install.img | grep refs/heads
+ostreesetup --nogpg --osname="fedora" --remote="fedora" --url="file:///ostree/repo" --ref="fedora/44/x86_64/kinoite"
+# ISO 無しでネット経由（遅い）:
 #ostreesetup --osname="fedora" --remote="fedora" --url="https://ostree.fedoraproject.org" --ref="fedora/44/x86_64/kinoite"
 
 # ----- SELinux / ファイアウォール --------------------------------------
@@ -60,7 +61,7 @@ reboot
 set -euo pipefail
 
 # ostree remote を公式に向け直す（以後の rpm-ostree upgrade は fedoraproject.org から）。
-# インストール時は NAS の repo（--nogpg）を使ったので、GPG 検証付きの公式 remote に置き換える。
+# インストール時は ISO 内の repo（file:///ostree/repo、--nogpg）を使ったので、GPG 検証付きの公式 remote に置き換える。
 ostree remote delete fedora || true
 ostree remote add --set=gpg-verify=true --set=gpgkeypath=/etc/pki/rpm-gpg/ fedora https://ostree.fedoraproject.org 2>/dev/null \
   || ostree remote add --no-gpg-verify fedora https://ostree.fedoraproject.org
