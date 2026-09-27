@@ -1,2 +1,2 @@
 [Context]
-filesystems=/run/udev:ro;~/.dotfiles/home/.var/app/com.brave.Browser:ro;
+filesystems=/run/udev:ro;

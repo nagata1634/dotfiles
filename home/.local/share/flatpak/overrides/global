@@ -1,5 +1,6 @@
 [Context]
-filesystems=xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/kdeglobals:ro;xdg-data/color-schemes:ro;
+filesystems=xdg-config/gtk-3.0:ro;xdg-config/gtk-4.0:ro;xdg-config/kdeglobals:ro;xdg-data/color-schemes:ro;~/.dotfiles/home/.config/flatpak-fonts:ro;
 
 [Environment]
 QT_QPA_PLATFORMTHEME=kde
+FONTCONFIG_FILE=/home/yuuya/.dotfiles/home/.config/flatpak-fonts/fonts.conf

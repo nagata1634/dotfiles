@@ -25,8 +25,6 @@ LINK_FILES=(
   .local/share/flatpak/overrides/global
   .local/share/flatpak/overrides/com.brave.Browser
   .local/share/flatpak/overrides/com.bitwarden.desktop
-  .var/app/md.obsidian.Obsidian/config/fontconfig/fonts.conf
-  .var/app/com.brave.Browser/config/fontconfig/fonts.conf
 )
 ENABLE_UNITS=(ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service qnap-tpbk.service)
 

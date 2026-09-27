@@ -80,11 +80,15 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 
 ## Flatpak
 
-- **日本語が豆腐になったら**（freedesktop 26.08 ランタイム）: `~/.var/app/<app>/config/fontconfig/fonts.conf`
-  に `<dir>/run/host/fonts</dir>` と JP 字形優先を書く（Obsidian で適用済み）
-  - 25.08 ランタイムの Brave でも発生（2026-09-28、英字は出て日本語だけ豆腐、GPU 無関係）。同じ fonts.conf で解決
-  - **ホームが見えないアプリ（Brave など）は symlink 先の dotfiles が読めない**。`overrides/<app>` に
-    `~/.dotfiles/home/.var/app/<app>:ro` を足す。確認は `flatpak run --command=sh <app> -c 'test -r "$XDG_CONFIG_HOME/fontconfig/fonts.conf"'`
+- **日本語フォントは global override で全アプリ一括**（アプリ別の fonts.conf は置かない。2026-09-28 本人指示）:
+  `overrides/global` の `FONTCONFIG_FILE` が `home/.config/flatpak-fonts/fonts.conf` を指し、そのフォルダだけ `:ro` で許可。
+  中身は `/etc/fonts/fonts.conf` を include し、`<dir>/run/host/fonts</dir>` と JP 字形優先を足すだけ
+  - 理由: freedesktop 26.08 ランタイムは `/run/host/fonts` を `/usr/share/fonts` として扱い、ランタイム自身の同名キャッシュ
+    （`/usr/lib/fontconfig/cache`）と衝突してホストのフォントが 0 件になる。`fc-cache -f` では直らない
+  - **toolbox から共有の `~/.cache/fontconfig` に書かせない**。toolbox の `/usr/share/fonts` の控えを Flatpak がホストの控えと
+    取り違え、GNOME 系も含め日本語が消える（作業用 Chrome の `browser-fonts.conf` は専用 `<cachedir>` を先頭に置いた）
+  - 確認: `flatpak run --command=sh <app> -c 'fc-list :lang=ja | wc -l; fc-cat -v /run/host/fonts | sed -n 2p'`
+    （件数が 0 か、控えが `/usr/lib/fontconfig/cache` なら本件）
 
 ## 再現とバックアップ
 
