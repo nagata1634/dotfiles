@@ -1,8 +1,9 @@
 # 設計ノート
 
 Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はスモール: 標準のまま使い、
-必要なものだけ外部（GitHub Releases / KDE Store / Flatpak / 最小の rpm-ostree レイヤ）から入れる。
-チェック機構は置かない。** ここには「今動いている設定」と「踏むと壊れる罠」だけを書く。
+必要なものだけ外部から入れる。チェック機構は置かない。**
+**担当分け: OS・アプリ（rpm レイヤ / Flatpak / docker-compose）・`/etc`（authselect / usb-wakeup）は
+`nagata1634/pxe-boot` の Kickstart と初回起動サービス。この dotfiles は `~/` の層だけ。** ここには「今動いている設定」と「踏むと壊れる罠」だけを書く。
 経緯（Sway/Sericea 時代、試して捨てた案）は git 履歴にある（2026-09-27 に圧縮）。
 
 構成: plasmalogin → `startplasma-wayland`、IME は fcitx5 + Mozc（KWin が起動）、タイルは Krohnkite、
@@ -10,20 +11,17 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 
 ## セッションと環境変数
 
-- plasmalogin の `wayland-session` は `bash --login` → `~/.bash_profile` → `~/.profile` を読む。
-  bash は `~/.bash_profile` があると `~/.profile` を読まないので、install.sh が読み込み行を追記する
-- `~/.config/environment.d/*.conf` も Plasma の systemd 統合で GUI まで届く。**空値の行（`FOO=`）は
-  invalid として無視される**ので、未設定にしたい変数は行ごと書かない
-- ロケール: GUI = 日本語、素の VT = 英語（VT のフォントは日本語を描けない）。実体は `locale.env`
-  （`environment.d/90-locale.conf` はそれへの symlink）。`/etc/profile.d/lang.sh` が VT で en_US に
-  置換し、`~/.bashrc.d/90-tty-locale.sh` が対話 VT だけ `C.UTF-8` に落とす（`$-` の対話ガード必須。
-  無いと非対話の GUI 起動まで英語になる）
+- GUI の環境変数は `~/.config/environment.d/*.conf` だけで足りる（Plasma の systemd 統合で GUI まで届く。
+  `~/.profile` は不要）。**空値の行（`FOO=`）は invalid として無視される**ので、未設定にしたい変数は行ごと書かない
+- ロケール: GUI = 日本語は `/etc/locale.conf`（Kickstart の `lang ja_JP.UTF-8`）のまま。素の VT は
+  `/etc/profile.d/lang.sh` が `LANG` を en_US にするが `LC_*` は日本語のまま残るので、
+  `~/.bashrc.d/90-tty-locale.sh` が対話 VT だけ `C.UTF-8` に落とす（`$-` の対話ガード必須）
 - `EDITOR`/`VISUAL` は `~/.bashrc.d/60-editor.sh`（`/etc/profile.d/nano-default-editor.sh` の上書き）
 - ssh-agent: `ssh-agent.socket` + `environment.d/10-ssh-agent.conf`。`~/.ssh/config` に `AddKeysToAgent yes`
 
 ## PAM・ログイン
 
-- authselect `custom/yuya-auth`（`system/authselect/`、install.sh が pkexec で配置）。
+- authselect `custom/yuya-auth`（pxe-boot が配置）。
   ログイン画面は Yubikey(u2f) → パスワード（`password-auth` に指紋なし、意図的）。
   ロック画面は kscreenlocker の `kde-fingerprint` で指紋が効く
 - **`/etc/plasma-setup-done` が無いと初回ウィザードが毎回走り**、自動ログイン設定を書いて
@@ -76,29 +74,16 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 - 蓋を閉じたままアンロックすると内蔵画面が復活する KDE のバグ → `kde-lid-unlock-fix.service` が
   アンロックを監視して `kscreen-doctor output.eDP-1.disable` を打ち直す
 - **未解決**: 3 画面から蓋を閉じるとパネルが消える。appletsrc の `lastScreen=-1` は逆効果（どこにも出なくなる）
-- ドックのキーボードで復帰させるには、経路上の全ハブの USB wakeup が必要 → `system/bin/usb-wakeup.sh`
-  （pre: 経路だけ有効化し指紋リーダーを落とす / post: udev を再発火して長時間サスペンド後の無反応を防ぐ）。
-  root なので手動で配置する:
+- ドックのキーボードでの復帰（全ハブの USB wakeup）は pxe-boot の `usb-wakeup.sh` が担当
 
-```sh
-pkexec install -m 0755 ~/.dotfiles/system/bin/usb-wakeup.sh /usr/local/bin/
-pkexec install -m 0644 ~/.dotfiles/system/systemd/usb-wakeup.service /etc/systemd/system/
-pkexec sh -c 'systemctl daemon-reload && systemctl enable usb-wakeup.service'
-```
+## Flatpak
 
-## パッケージ
-
-- `packages.txt` = 明示的にレイヤしたものだけ（`rpm-ostree status` の requested-packages）。
-  ベース同梱は消さず、使わないものは `NoDisplay=true` の desktop ファイルで隠す。Firefox は予備として残す
-- `code` をレイヤで持つのは、Flatpak 版だと podman/DevContainer 連携にラッパーが要るため。
-  `docker-compose` は公式バイナリを `~/.local/bin` へ（`podman compose` がこれを使う。
-  VS Code の `dockerComposePath` は絶対パスで指定）
-- **Flatpak の日本語が豆腐になったら**（freedesktop 26.08 ランタイム）: `~/.var/app/<app>/config/fontconfig/fonts.conf`
+- **日本語が豆腐になったら**（freedesktop 26.08 ランタイム）: `~/.var/app/<app>/config/fontconfig/fonts.conf`
   に `<dir>/run/host/fonts</dir>` と JP 字形優先を書く（Obsidian で適用済み）
 
 ## 再現とバックアップ
 
-PXE（`nagata1634/pxe-boot`）→ Kickstart（`bootstrap/`）→ `install.sh` → `kde-snapshot restore`。
+PXE + Kickstart（`nagata1634/pxe-boot`）→ 初回ログインで `install.sh` → `kde-snapshot restore`。
 データは Pika Backup（NAS、sshfs `~/mnt/qnap-tpbk`）から選択復元する。
 - **Pika の除外に `~/mnt` 必須**（無いと NAS 全体を取り込む）
 - **Pika の実行中に `qnap-tpbk.service` を restart しない**（borg が落ちてロックが残る）。
@@ -110,8 +95,7 @@ PXE（`nagata1634/pxe-boot`）→ Kickstart（`bootstrap/`）→ `install.sh` �
 ## 構造
 
 ```
-install.sh   packages.txt   flatpaks.txt   bootstrap/（Kickstart）
-system/      /etc・/usr/local 側（authselect、usb-wakeup）
+install.sh
 home/        ~/ への symlink 元（~/.config/fcitx5 などはディレクトリ単位、
              ~/.bashrc.d と systemd/user はファイル単位）
 ```

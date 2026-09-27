@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
-# dotfiles — Fedora Kinoite (KDE Plasma) の環境をこのマシンに再現する。冪等。
+# dotfiles — ~/ の層だけを入れる。冪等。OS・アプリ・/etc は pxe-boot の Kickstart が担当。
 #
 #   curl -fsSL https://raw.githubusercontent.com/nagata1634/dotfiles/main/install.sh | bash
-#
-# 理由は CLAUDE.md を参照。
 set -euo pipefail
 
-REPO="https://github.com/nagata1634/dotfiles.git"
 DIR="$HOME/.dotfiles"
 TS="$(date +%Y%m%d-%H%M%S)"
 
@@ -14,13 +11,10 @@ TS="$(date +%Y%m%d-%H%M%S)"
 LINK_DIRS=(fcitx5 environment.d)
 # ファイル単位でリンクするもの（~/.bashrc.d や systemd/user は環境固有のファイルと同居するため）
 LINK_FILES=(
-  .profile
-  .bashrc
   .bashrc.d/60-editor.sh
   .bashrc.d/90-tty-locale.sh
   .vscode/argv.json
   .config/kde-scripts/lid-unlock-output-fix.sh
-  .config/kde-scripts/panel-sensors.js
   .config/systemd/user/kde-lid-unlock-fix.service
   .config/systemd/user/qnap-tpbk.service
   .local/bin/kde-snapshot
@@ -43,19 +37,11 @@ KDE_PACKAGES=(
 )
 THEME_REPOS=(vinceliuice/WhiteSur-kde vinceliuice/WhiteSur-icon-theme)
 
-latest_asset() {  # $1=repo $2=asset の末尾 → ダウンロード URL
-  curl -fsSL "https://api.github.com/repos/$1/releases/latest" \
-    | grep -oE '"browser_download_url": *"[^"]+'"$2"'"' | head -1 | cut -d'"' -f4
-}
-
 # 1. リポジトリ
-if [ -d "$DIR/.git" ]; then git -C "$DIR" pull --ff-only; else git clone "$REPO" "$DIR"; fi
+if [ -d "$DIR/.git" ]; then git -C "$DIR" pull --ff-only
+else git clone https://github.com/nagata1634/dotfiles.git "$DIR"; fi
 
-# 2. rpm-ostree レイヤ（intel-media-driver は RPM Fusion が先に要る）
-mapfile -t pkgs < <(sed 's/#.*//' "$DIR/packages.txt" | xargs -n1)
-rpm-ostree install --idempotent --allow-inactive "${pkgs[@]}"
-
-# 3. シンボリックリンク（既存の実体は .bak.<日時> に退避）
+# 2. シンボリックリンク（既存の実体は .bak.<日時> に退避）
 link() {
   local src="$DIR/home/$1" dst="$HOME/$1"
   [ "$(readlink -f "$dst")" = "$(readlink -f "$src")" ] && return 0
@@ -66,28 +52,18 @@ link() {
 for d in "${LINK_DIRS[@]}"; do link ".config/$d"; done
 for f in "${LINK_FILES[@]}"; do link "$f"; done
 
-# plasmalogin は bash --login で起動し、bash は ~/.bash_profile があると ~/.profile を読まないので読ませる
-grep -qF '. "$HOME/.profile"' ~/.bash_profile 2>/dev/null \
-  || printf '\n[ -r "$HOME/.profile" ] && . "$HOME/.profile"\n' >> ~/.bash_profile
-
-# 4. docker-compose（podman compose の provider）
-url="$(latest_asset docker/compose docker-compose-linux-x86_64)"
-mkdir -p ~/.local/bin && curl -fsSL "$url" -o ~/.local/bin/docker-compose && chmod +x ~/.local/bin/docker-compose
-
-# 5. Flatpak
-flatpak remote-add --if-not-exists --system flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-sed 's/#.*//' "$DIR/flatpaks.txt" | xargs -r flatpak install -y --or-update --system --noninteractive flathub
-
-# 6. KDE 拡張（KDE Store と同じ GitHub Releases のアーカイブ）
+# 3. KDE 拡張（KDE Store と同じ GitHub Releases のアーカイブ）
 for spec in "${KDE_PACKAGES[@]}"; do
   IFS='|' read -r repo type id suffix post <<<"$spec"
-  tmp="$(mktemp -d)"; curl -fsSL "$(latest_asset "$repo" "$suffix")" -o "$tmp/pkg$suffix"
+  url="$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
+    | grep -oE '"browser_download_url": *"[^"]+'"$suffix"'"' | head -1 | cut -d'"' -f4)"
+  tmp="$(mktemp -d)"; curl -fsSL "$url" -o "$tmp/pkg$suffix"
   kpackagetool6 -t "$type" -u "$tmp/pkg$suffix" 2>/dev/null || kpackagetool6 -t "$type" -i "$tmp/pkg$suffix"
   rm -rf "$tmp"
   if [ -n "$post" ]; then "$(kpackagetool6 -t "$type" -s "$id" | sed -n 's/^Path *: *//p')/$post"; fi
 done
 
-# 7. テーマ（WhiteSur の Aurorae 装飾とアイコン。kde-snapshot が参照する）
+# 4. テーマ（WhiteSur の Aurorae 装飾とアイコン。kde-snapshot が参照する）
 for repo in "${THEME_REPOS[@]}"; do
   src="$HOME/.cache/dotfiles-src/${repo##*/}"
   [ -d "$src" ] || git clone -q --depth 1 "https://github.com/$repo.git" "$src"
@@ -97,19 +73,14 @@ for repo in "${THEME_REPOS[@]}"; do
   esac
 done
 
-# 8. authselect（Yubikey → 指紋 → パスワード）
-authselect current 2>/dev/null | grep -q custom/yuya-auth \
-  || pkexec sh -c "mkdir -p /etc/authselect/custom/yuya-auth && cp '$DIR'/system/authselect/yuya-auth/* /etc/authselect/custom/yuya-auth/ && authselect select custom/yuya-auth with-pam-u2f with-fingerprint with-mdns4 with-silent-lastlog --force"
-
-# 9. systemd --user
+# 5. systemd --user
 systemctl --user daemon-reload
 systemctl --user enable "${ENABLE_UNITS[@]}"
 
 cat <<'EOF'
 
 完了。初回だけ手動で:
-  kde-snapshot restore                                   # KDE 設定を復元 → ログアウト/ログイン
+  kde-snapshot restore        # KDE 設定と Pika Backup の設定を復元 → ログアウト/ログイン
   mkdir -p ~/.config/Yubico && pamu2fcfg > ~/.config/Yubico/u2f_keys
-  system/ の usb-wakeup は CLAUDE.md の手順で pkexec 配置
   データは Pika Backup（NAS）から復元
 EOF
