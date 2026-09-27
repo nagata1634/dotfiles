@@ -82,6 +82,9 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 
 - **日本語が豆腐になったら**（freedesktop 26.08 ランタイム）: `~/.var/app/<app>/config/fontconfig/fonts.conf`
   に `<dir>/run/host/fonts</dir>` と JP 字形優先を書く（Obsidian で適用済み）
+  - 25.08 ランタイムの Brave でも発生（2026-09-28、英字は出て日本語だけ豆腐、GPU 無関係）。同じ fonts.conf で解決
+  - **ホームが見えないアプリ（Brave など）は symlink 先の dotfiles が読めない**。`overrides/<app>` に
+    `~/.dotfiles/home/.var/app/<app>:ro` を足す。確認は `flatpak run --command=sh <app> -c 'test -r "$XDG_CONFIG_HOME/fontconfig/fonts.conf"'`
 
 ## 再現とバックアップ
 
