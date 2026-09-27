@@ -27,8 +27,12 @@
       "Caches",
       "Trash",
       "VmsContainers",
-      "pp:mnt",
-      "pp:.local/share/containers"
+      {
+        "PathPrefix": "mnt"
+      },
+      {
+        "PathPrefix": ".local/share/containers"
+      }
     ],
     "schedule": {
       "enabled": true,
