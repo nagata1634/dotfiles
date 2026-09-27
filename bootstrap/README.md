@@ -7,10 +7,10 @@
 
 | 段階 | 担当 | 内容 |
 |---|---|---|
-| 0. 事前 | `backup-check` / Pika Backup | **最終成功が 24h 以内**であること（`backup-check`）。直前に Pika で「今すぐバックアップ」を 1 回 |
+| 0. 事前 | Pika Backup | 画面で最終成功が直近であることを見て、「今すぐバックアップ」を 1 回 |
 | 1. OS | `fedora-kinoite.ks`（PXE 経由） | パーティション・LUKS（対話）・ロケール・ostree deploy |
 | 2. 初回起動 | Plasma Setup（Kinoite 標準） | ユーザー作成 |
-| 3. ユーザー環境 | `../install.sh` | レイヤ（要再起動→再実行）・フォント・symlink・Flatpak・テーマ・KDE 拡張・authselect・**KDE 設定と Pika 設定のスナップショット復元** |
+| 3. ユーザー環境 | `../install.sh` | レイヤ（要再起動→再実行）・symlink・Flatpak・テーマ・KDE 拡張・authselect。続けて `kde-snapshot restore`（**KDE 設定と Pika 設定の復元**） |
 | 4. 鍵 | 手動（Yubikey） | `pamu2fcfg > ~/.config/Yubico/u2f_keys`（PAM）、`ssh-keygen -K`（NAS 用 resident key の復元）→ `systemctl --user start qnap-tpbk` でマウント確認 |
 | 5. データ | Pika Backup | Pika を開く → 復元された設定に repo が見えている → パスフレーズ（Bitwarden）→ **アーカイブから選択復元**（下記） |
 | 6. 確定 | ログアウト → ログイン | ショートカット・仮想デスクトップ・モニタ配置は KWin が起動時に読む。ブラウザ/Bitwarden のログインは手動 |
@@ -58,12 +58,12 @@ Atomic の Kickstart `%post` はイメージが deploy された直後の状態�
 - **Yubikey の登録**（`~/.config/Yubico/u2f_keys`）: 機器固有。`install.sh` が未登録なら案内を出す
 - **borg のパスフレーズ**（Pika）: keyring にしか無い。Bitwarden に控えておく
 
-## 記録している設定（`install.sh` が復元するもの）
+## 記録している設定
 
 - `home/.config/kde-snapshot/`: パネル・ウィジェット・KWin・ショートカット・外観・入力・電源、
   **Pika Backup の設定**（repo の場所・対象・スケジュール）（`kde-snapshot save` で更新。壁紙画像のパスは記録しない）
 - `flatpaks.txt` + `home/.local/share/flatpak/overrides/`
-- `packages.txt`（rpm-ostree レイヤ）、`fonts.txt`
+- `packages.txt`（rpm-ostree レイヤ）
 - `KDE_PACKAGES`（Monitor Align / Span Image / Krohnkite = GitHub Release）、`THEME_REPOS`（WhiteSur）
 - `system/authselect/yuya-auth/`（PAM: Yubikey → 指紋 → パスワード）
 

@@ -1,8 +1,0 @@
-[Unit]
-Description=画面を戻し、離席が長すぎないか判定する
-PartOf=sway-session.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/swaymsg -q "output * power on"
-ExecStart=/usr/bin/systemctl --user start sway-away-check.service

@@ -1,8 +1,0 @@
-[Unit]
-Description=Sway セッションを終了して tuigreet に戻す（ログアウトの唯一の出口）
-# PartOf=sway-session.target は付けない。付けると自分自身を止めることになる。
-
-[Service]
-Type=oneshot
-ExecStartPre=/usr/bin/rm -f %t/sway-away-since
-ExecStart=/usr/bin/swaymsg -q exit

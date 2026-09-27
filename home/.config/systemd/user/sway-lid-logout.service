@@ -1,9 +1,0 @@
-[Unit]
-Description=蓋を閉じて内蔵画面だけならログアウトする
-PartOf=sway-session.target
-
-[Service]
-Type=oneshot
-ExecCondition=%h/.config/sway/scripts/lid-should-logout.py
-# ここだけ --no-block を付けない。サスペンドより前にログアウトを完了させたいので同期で待つ。
-ExecStart=/usr/bin/systemctl --user start sway-logout.service

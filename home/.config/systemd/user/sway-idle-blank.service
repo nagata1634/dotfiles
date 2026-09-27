@@ -1,8 +1,0 @@
-[Unit]
-Description=画面を消す（暗転のみ。ロックはしない）
-PartOf=sway-session.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/swaymsg -q "output * power off"
-ExecStart=/usr/bin/systemctl --user start sway-away-mark.service

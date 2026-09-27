@@ -8,7 +8,7 @@
 # よくある誤解で、既存の trackpad-usb-reset.sh はこれが原因で一度も実行されていない。
 # Atomic では /usr に書けないので、フックではなく unit で sleep.target に紐付ける。
 #
-# 目的は 2 つ。
+# 目的は 4 つ。
 #
 # 1) 指定した HID を「機器の identity (VID:PID)」から root hub まで遡って
 #    サスペンド復帰源にする。USB の remote wakeup は経路上のハブが全て
@@ -21,6 +21,26 @@
 #    root hub の remote wakeup を叩く。結果「サスペンドした 1〜2 秒後に
 #    勝手に復帰する」状態になる（2026-08-30 に実測で確定。ポートを落とすと
 #    33 秒眠れ、キーボードで復帰できた）。
+#
+# 3) 復帰直後に USB / DRM の udev change イベントを再発火させる。
+#    2026-09-14、5.5 日間の長時間サスペンドから復帰した際、ドック配下十数台が
+#    一斉に再列挙され、外部キーボードが無反応・外部ディスプレイ 2 枚が
+#    「connected/enabled」のまま無表示という状態が発生した。手動で
+#    `udevadm trigger --action=change --subsystem-match=usb` と
+#    `--subsystem-match=drm` を打つと復旧したため、post 側で毎回自動実行する。
+#    ドック非接続時（armed=0）でも安全な no-op なので無条件に実行する。
+#
+# 4) KVM切替器がWindows側を選択している状態でサスペンドすると、ドック配下の
+#    機器(REALFORCE等)がUSB的に消えており、2)の経路計算が「対象なし」で
+#    スキップされ、復帰源が一切組まれない(2026-09-14に発覚。5.5日間ドック
+#    無しで放置後、KVMをLinux側に戻して外部キーボードを叩いても内蔵キーボード
+#    等でしか起こせなかった)。ただし KVM 切替時もこの物理ポートに常時挿さって
+#    いる上流ハブ(3-1, GenesysLogic 05e3:0610。切替時のdisconnectログに
+#    3-1自体は一度も出てこない)は生き残っているため、そこだけは配下に何も
+#    無くても常時 wakeup を有効化しておく。KVM を Linux 側へ切り替えた瞬間の
+#    ポート connect イベントが root hub まで届くことを狙っているが、
+#    ハードウェアが「配下無しのハブでの connect wakeup」を実際に伝搬するかは
+#    未検証(次回のKVM切替+サスペンド運用で要確認)。
 #
 # systemd-sleep 引数: $1=pre|post  $2=suspend|hibernate|...  root で実行される。
 
@@ -36,6 +56,10 @@ WAKE_DEVICES="0853:0311 056e:0182"   # REALFORCE / IST TrackBall
 BLOCK_DEVICES="27c6:6594"                       # Goodix 指紋リーダー（内蔵）
 
 STATE=/run/usb-wakeup.disabled-ports
+
+# KVM切替器の常設アップリンクハブ(3-1)。ラップトップ本体側の物理ポート位置で
+# 固定されており、KVMがWindows側を選択していてもここ自体は切断されない。
+STATIC_UPSTREAM_PORT=/sys/bus/usb/devices/3-1
 
 # VID:PID から sysfs のデバイスディレクトリを引く（複数該当しうる）
 usb_dirs_of() {
@@ -88,6 +112,14 @@ case "$1" in
       done
     done
 
+    # 2.5. KVM切替器の常設アップリンクハブは、配下に何も無くても
+    #      (KVMがWindows側を選択していても)常時 wakeup を有効化しておく。
+    #      KVMをLinux側に戻した瞬間のconnectイベントを拾うための保険。
+    if [ -w "$STATIC_UPSTREAM_PORT/power/wakeup" ]; then
+      echo enabled > "$STATIC_UPSTREAM_PORT/power/wakeup" 2>/dev/null
+      logger -t usb-wakeup "static upstream hub $(basename "$STATIC_UPSTREAM_PORT") wakeup force-enabled (KVM passthrough)"
+    fi
+
     # 3. ノイズ源をポートごと落とす。戻す対象を /run に控える。
     #
     # 経路を 1 つも張れなかったとき（＝ドックを外してノート単体で使っているとき）は
@@ -111,6 +143,14 @@ case "$1" in
     ;;
 
   post)
+    # 復帰直後、長時間サスペンド後の大量再列挙で USB 入力機器や外部
+    # ディスプレイの状態が更新されないまま残るのを防ぐため、udev の
+    # change イベントを無条件に再発火させる。ドック非接続時も安全な no-op。
+    udevadm trigger --action=change --subsystem-match=usb 2>/dev/null
+    udevadm trigger --action=change --subsystem-match=drm 2>/dev/null
+    udevadm settle --timeout=5 2>/dev/null
+    logger -t usb-wakeup "post-resume udev retrigger (usb, drm) done"
+
     # pre で落としたポートだけを戻す（device リンクは切れているので控えを使う）
     [ -f "$STATE" ] || exit 0
     while read -r p; do

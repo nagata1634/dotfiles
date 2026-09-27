@@ -3,7 +3,7 @@
 # ここに置く理由: Fedora の /etc/bashrc は非ログインシェルに対して /etc/profile.d/* を
 # 読み直すため、~/.profile に書いても端末では nano に戻される。~/.bashrc.d は
 # その後に読まれるので、ここが唯一勝てる場所であり宣言箇所を1つに保てる。
-# 詳細は ~/.dotfiles/CLAUDE.md の「EDITOR / VISUAL」を参照。
+# 詳細は ~/.dotfiles/CLAUDE.md の「セッションと環境変数」を参照。
 export EDITOR=nvim
 
 # VISUAL は GUI セッションのときだけ。素の TTY で VSCode は起動できず、

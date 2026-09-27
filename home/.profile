@@ -1,10 +1,9 @@
-# GUI(sway)セッションの環境。ここが sway 配下の全 GUI アプリの環境の起点になる。
+# GUI(KDE Plasma)セッションの環境の起点。
 #
-# greetd はセッションを次のコマンドで起動する（バイナリに埋め込まれている）:
-#   [ -f /etc/profile ] && . /etc/profile; [ -f $HOME/.profile ] && . $HOME/.profile; exec sway
-# つまり読まれるのは ~/.profile であって ~/.bash_profile ではない。
-# sh で読まれるので POSIX 記法のみ（[[ ]]・配列・local は使えない）。
-# 詳細は ~/.dotfiles/CLAUDE.md の「GUI セッションの環境（~/.profile）」を参照。
+# plasmalogin の /etc/plasmalogin/wayland-session が bash --login で ~/.bash_profile を読み、
+# そこから（install.sh が挿入したブロックで）このファイルが読まれてから startplasma-wayland に入る。
+# 環境によっては sh から読まれうるので POSIX 記法のみ（[[ ]]・配列・local は使えない）。
+# 詳細は ~/.dotfiles/CLAUDE.md の「セッションと環境変数」を参照。
 
 # ロケール。/etc/profile.d/lang.sh が CJK ロケールを en_US へ置換した後にあたるので
 # ここで上書きする。TTY では ~/.bashrc.d/90-tty-locale.sh が先に LC_ALL を立てるため
@@ -17,7 +16,7 @@ fi
 
 # ssh-agent のソケット。値の単一の真実の源は environment.d/10-ssh-agent.conf
 # （systemd --user 側が読む同じファイル）。二重定義しない。
-# これが無いと sway から起動した VS Code が SSH_AUTH_SOCK を持たず、
+# これが無いと GUI から起動した VS Code が SSH_AUTH_SOCK を持たず、
 # devcontainer への転送も起きない。
 if [ -r "$HOME/.config/environment.d/10-ssh-agent.conf" ]; then
     set -a
