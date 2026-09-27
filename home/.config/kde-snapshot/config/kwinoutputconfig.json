@@ -74,7 +74,7 @@
                 "brightness": 1,
                 "colorPowerTradeoff": "PreferEfficiency",
                 "colorProfileSource": "sRGB",
-                "connectorName": "DP-5",
+                "connectorName": "DP-7",
                 "customModes": [
                 ],
                 "detectedDdcCi": false,
@@ -241,6 +241,7 @@
                 "hdrIccProfilePath": "",
                 "highDynamicRange": false,
                 "iccProfilePath": "",
+                "maxBitsPerColor": 0,
                 "mode": {
                     "flags": 0,
                     "height": 1440,
@@ -343,6 +344,7 @@
                 "hdrIccProfilePath": "",
                 "highDynamicRange": false,
                 "iccProfilePath": "",
+                "maxBitsPerColor": 0,
                 "mode": {
                     "flags": 0,
                     "height": 1440,
@@ -800,21 +802,21 @@
                 "lidClosed": true,
                 "outputs": [
                     {
-                        "enabled": true,
+                        "enabled": false,
                         "outputIndex": 0,
                         "position": {
                             "x": 0,
-                            "y": 0
+                            "y": 745
                         },
-                        "priority": 0,
+                        "priority": 1,
                         "replicationSource": ""
                     },
                     {
                         "enabled": true,
                         "outputIndex": 6,
                         "position": {
-                            "x": 1920,
-                            "y": 0
+                            "x": 0,
+                            "y": 745
                         },
                         "priority": 1,
                         "replicationSource": ""
@@ -823,7 +825,7 @@
                         "enabled": true,
                         "outputIndex": 4,
                         "position": {
-                            "x": 3890,
+                            "x": 1969,
                             "y": 0
                         },
                         "priority": 2,

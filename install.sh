@@ -95,8 +95,8 @@ LINK_FILES=(
   ".vscode/argv.json"
   ".claude/skills/system-audit"
 )
-# ~/.bashrc.d/ はディレクトリごとリンクしない。環境固有のスクリプト
-# （bitwarden.sh など）が消えるため、ファイル単位で扱う。
+# ~/.bashrc.d/ はディレクトリごとリンクしない。環境ごとに置く個別の
+# スクリプトが消えるため、ファイル単位で扱う。
 # ~/.claude/skills/ も同じ理由でスキル単位（プラグイン由来のスキルが同居するため）。
 # 有効化する systemd --user ユニット（常駐のみ。sway-* の oneshot は start されるだけ）
 ENABLE_UNITS=(ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service qnap-tpbk.service pwa-calendar.service pwa-gmail.service flextop-backup-cleanup.path backup-check.timer)

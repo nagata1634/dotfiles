@@ -635,7 +635,6 @@ GUI から書き換わる設定ファイル自体は dotfiles 管理下に**入�
 | `~/.bashrc.d/50-aliases.sh` | エイリアス・関数 |
 | `~/.bashrc.d/60-editor.sh` | `EDITOR` / `VISUAL` |
 | `~/.bashrc.d/90-tty-locale.sh` | 対話 TTY を `LC_ALL=C.UTF-8` に落とす |
-| `~/.bashrc.d/bitwarden.sh` | `bwu`（Bitwarden 解錠）。**dotfiles には含めない**（環境固有のコンテナ依存） |
 
 **公開リポジトリなので機密を入れない**。`.gitignore` で環境固有の秘密情報を除外している。
 

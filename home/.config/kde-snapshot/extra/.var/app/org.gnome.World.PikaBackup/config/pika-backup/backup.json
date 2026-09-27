@@ -26,7 +26,9 @@
     "exclude": [
       "Caches",
       "Trash",
-      "VmsContainers"
+      "VmsContainers",
+      "pp:mnt",
+      "pp:.local/share/containers"
     ],
     "schedule": {
       "enabled": true,

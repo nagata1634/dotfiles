@@ -5,7 +5,7 @@ RightButton;NoModifier=org.kde.contextmenu
 RightButton;NoModifier=org.kde.contextmenu
 
 [Containments][1]
-ItemGeometries-1920x1080=
+ItemGeometries-1920x1080=Applet-80:0,0,432,304,0;
 ItemGeometries-1969x1108=Applet-80:0,0,432,304,0;
 ItemGeometriesHorizontal=Applet-80:0,0,432,304,0;
 activityId=a526bd08-6f34-4f2f-a491-3e80fec14424
@@ -472,8 +472,8 @@ AppletOrder=171;172;193;200;173;194;195;196;199;175;207;208
 
 [Containments][29]
 ItemGeometries-1108x1969=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,816,0;
-ItemGeometries-1969x1108=
-ItemGeometriesHorizontal=
+ItemGeometries-1969x1108=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,544,0;
+ItemGeometriesHorizontal=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,544,0;
 ItemGeometriesVertical=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,816,0;
 activityId=a526bd08-6f34-4f2f-a491-3e80fec14424
 formfactor=0
@@ -567,6 +567,9 @@ plugin=org.kde.plasma.battery
 [Containments][29][Applets][206]
 immutability=1
 plugin=org.kde.plasma.quicklaunch
+
+[Containments][29][Applets][206][Configuration][General]
+launcherUrls=file:///var/lib/flatpak/exports/share/applications/md.obsidian.Obsidian.desktop
 
 [Containments][29][Applets][209]
 immutability=1
