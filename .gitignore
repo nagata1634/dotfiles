@@ -1,21 +1,6 @@
-# Python
-__pycache__/
-*.pyc
-
-# Claude Code のローカル設定（リポジトリ直下のみ）。
-# 先頭の / が無いと任意の階層にマッチし、管理対象の home/.claude/ まで除外してしまう。
-/.claude/
-home/.claude/settings.local.json
-
-# エディタ/OS
+# fcitx5 が実行時に生成するキャッシュ
+home/.config/fcitx5/conf/cached_layouts
+# install.sh / kde-snapshot が作る退避ファイル
+*.bak.[0-9]*
 *.swp
 *~
-.DS_Store
-
-# fcitx5 が実行時に生成するキャッシュ（設定ではない）
-home/.config/fcitx5/conf/cached_layouts
-
-# 環境固有のため公開リポジトリに含めないもの
-
-# install.sh が作る退避ファイル
-*.bak.[0-9]*
