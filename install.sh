@@ -35,7 +35,6 @@ KDE_PACKAGES=(
   "nagata1634/plasma-spanimage|Plasma/Wallpaper|dev.yuya.spanimage|.wallpaper.zip|"
   "anametologin/krohnkite|KWin/Script|krohnkite|.kwinscript|"
 )
-THEME_REPOS=(vinceliuice/WhiteSur-kde vinceliuice/WhiteSur-icon-theme)
 
 # 1. リポジトリ
 if [ -d "$DIR/.git" ]; then git -C "$DIR" pull --ff-only
@@ -63,15 +62,10 @@ for spec in "${KDE_PACKAGES[@]}"; do
   if [ -n "$post" ]; then "$(kpackagetool6 -t "$type" -s "$id" | sed -n 's/^Path *: *//p')/$post"; fi
 done
 
-# 4. テーマ（WhiteSur の Aurorae 装飾とアイコン。kde-snapshot が参照する）
-for repo in "${THEME_REPOS[@]}"; do
-  src="$HOME/.cache/dotfiles-src/${repo##*/}"
-  [ -d "$src" ] || git clone -q --depth 1 "https://github.com/$repo.git" "$src"
-  case "$repo" in
-    */WhiteSur-kde)        (cd "$src" && ./install.sh) ;;
-    */WhiteSur-icon-theme) (cd "$src" && ./install.sh -d "$HOME/.local/share/icons") ;;
-  esac
-done
+# 4. ウィンドウ装飾（kwinrc が Aurorae の WhiteSur-dark を参照する）
+src="$HOME/.cache/dotfiles-src/WhiteSur-kde"
+[ -d "$src" ] || git clone -q --depth 1 https://github.com/vinceliuice/WhiteSur-kde.git "$src"
+(cd "$src" && ./install.sh)
 
 # 5. systemd --user
 systemctl --user daemon-reload

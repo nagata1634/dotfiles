@@ -7,7 +7,7 @@ OS・アプリ・`/etc` は [`nagata1634/pxe-boot`](https://github.com/nagata163
 curl -fsSL https://raw.githubusercontent.com/nagata1634/dotfiles/main/install.sh | bash
 ```
 
-冪等。symlink → KDE 拡張（Monitor Align / Span Image / Krohnkite）→ WhiteSur テーマ → systemd --user の順。
+冪等。symlink → KDE 拡張（Monitor Align / Span Image / Krohnkite）→ WhiteSur のウィンドウ装飾 → systemd --user の順。
 
 初回だけ手動で行うこと:
 
