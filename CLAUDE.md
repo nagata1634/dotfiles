@@ -8,6 +8,8 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 
 構成: plasmalogin → `startplasma-wayland`、IME は fcitx5 + Mozc（KWin が起動）、タイルは Krohnkite、
 ロックは kscreenlocker、ランチャーは KRunner、ブラウザは Brave(Flatpak)。`/var/home` は LUKS 上の btrfs。
+アプリストアは **Discover だけ**（ベース同梱で外せず、rpm-ostree 更新の通知も Discover の notifier しか
+担っていない。Flathub 専用の Bazaar は二重管理になるので 2026-09-28 に撤去）。
 
 ## セッションと環境変数
 
