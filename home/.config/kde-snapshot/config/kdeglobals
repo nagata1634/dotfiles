@@ -133,10 +133,11 @@ ForegroundPositive=133,153,0
 ForegroundVisited=108,113,196
 
 [General]
+BrowserApplication=browser-fallback.desktop
 ColorSchemeHash=f02f51ef56015b5e3d4181c382186332125fa2df
 
 [KDE]
-AutomaticLookAndFeel=true
+AutomaticLookAndFeel=false
 AutomaticLookAndFeelOnIdle=true
 DefaultDarkLookAndFeel=dev.yuya.solarized.dark
 DefaultLightLookAndFeel=dev.yuya.solarized.light

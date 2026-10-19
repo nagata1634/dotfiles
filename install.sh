@@ -18,6 +18,8 @@ LINK_FILES=(
   .config/systemd/user/kde-lid-unlock-fix.service
   .config/systemd/user/qnap-tpbk.service
   .local/bin/kde-snapshot
+  .local/bin/browser-open
+  .local/share/applications/browser-fallback.desktop
   .local/share/color-schemes/SolarizedLight.colors
   .local/share/color-schemes/SolarizedDark.colors
   .local/share/plasma/look-and-feel/dev.yuya.solarized.light

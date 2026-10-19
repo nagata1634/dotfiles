@@ -3,3 +3,6 @@ Seen=true
 
 [Applications][org.gnome.World.PikaBackup]
 Seen=true
+
+[Applications][org.mozilla.firefox]
+Seen=true

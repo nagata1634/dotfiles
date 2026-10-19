@@ -1,0 +1,17 @@
+#!/bin/bash
+# 標準ブラウザ（browser-fallback.desktop の実体）。Brave で開き、起動に失敗したら Firefox で開く。
+# 失敗＝10 秒以内に終了コード 0 以外で終わったとき。Brave が既に起動していれば URL を渡してすぐ 0 で終わる。
+# 固まって終わらない場合は検知できない（その場合は手で Firefox を開く）。
+primary="${BROWSER_PRIMARY:-com.brave.Browser}"
+
+flatpak run "$primary" "$@" &
+pid=$!
+for _ in $(seq 20); do
+  if ! kill -0 "$pid" 2>/dev/null; then
+    wait "$pid" && exit 0
+    notify-send -a ブラウザ "Brave が開けなかったので Firefox で開きます"
+    exec firefox "$@"
+  fi
+  sleep 0.5
+done
+exit 0

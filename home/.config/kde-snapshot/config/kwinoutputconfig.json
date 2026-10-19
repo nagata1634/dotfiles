@@ -151,7 +151,7 @@
                 "sdrBrightness": 417,
                 "sdrGamutWideness": 0,
                 "sharpness": 0,
-                "transform": "Rotated270",
+                "transform": "Rotated90",
                 "uuid": "0930235f-d2f4-4d11-b190-4792756d6dac",
                 "vrrPolicy": "Never",
                 "wideColorGamut": false
@@ -189,7 +189,6 @@
                 "hdrIccProfilePath": "",
                 "highDynamicRange": false,
                 "iccProfilePath": "",
-                "maxBitsPerColor": 0,
                 "mode": {
                     "flags": 0,
                     "height": 1440,
@@ -241,7 +240,6 @@
                 "hdrIccProfilePath": "",
                 "highDynamicRange": false,
                 "iccProfilePath": "",
-                "maxBitsPerColor": 0,
                 "mode": {
                     "flags": 0,
                     "height": 1440,
@@ -282,7 +280,7 @@
                 "brightness": 1,
                 "colorPowerTradeoff": "PreferEfficiency",
                 "colorProfileSource": "sRGB",
-                "connectorName": "DP-6",
+                "connectorName": "DP-8",
                 "customModes": [
                 ],
                 "detectedDdcCi": false,
@@ -344,7 +342,6 @@
                 "hdrIccProfilePath": "",
                 "highDynamicRange": false,
                 "iccProfilePath": "",
-                "maxBitsPerColor": 0,
                 "mode": {
                     "flags": 0,
                     "height": 1440,
@@ -376,7 +373,7 @@
                         "outputIndex": 0,
                         "position": {
                             "x": 0,
-                            "y": 0
+                            "y": 702
                         },
                         "priority": 1,
                         "replicationSource": ""
@@ -386,7 +383,7 @@
                         "outputIndex": 1,
                         "position": {
                             "x": 1920,
-                            "y": 0
+                            "y": 702
                         },
                         "priority": 2,
                         "replicationSource": ""
@@ -395,7 +392,7 @@
                         "enabled": true,
                         "outputIndex": 2,
                         "position": {
-                            "x": 3890,
+                            "x": 3889,
                             "y": 0
                         },
                         "priority": 3,
@@ -421,7 +418,7 @@
                         "outputIndex": 1,
                         "position": {
                             "x": 0,
-                            "y": 745
+                            "y": 702
                         },
                         "priority": 1,
                         "replicationSource": ""
@@ -666,7 +663,7 @@
                         "outputIndex": 0,
                         "position": {
                             "x": 0,
-                            "y": 0
+                            "y": 702
                         },
                         "priority": 1,
                         "replicationSource": ""
@@ -676,7 +673,7 @@
                         "outputIndex": 3,
                         "position": {
                             "x": 1920,
-                            "y": 0
+                            "y": 702
                         },
                         "priority": 2,
                         "replicationSource": ""
@@ -685,7 +682,7 @@
                         "enabled": true,
                         "outputIndex": 5,
                         "position": {
-                            "x": 3890,
+                            "x": 3889,
                             "y": 0
                         },
                         "priority": 3,
@@ -829,6 +826,56 @@
                             "y": 0
                         },
                         "priority": 2,
+                        "replicationSource": ""
+                    }
+                ]
+            },
+            {
+                "lidClosed": true,
+                "outputs": [
+                    {
+                        "enabled": false,
+                        "outputIndex": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "priority": 0,
+                        "replicationSource": ""
+                    },
+                    {
+                        "enabled": true,
+                        "outputIndex": 3,
+                        "position": {
+                            "x": 1920,
+                            "y": 0
+                        },
+                        "priority": 1,
+                        "replicationSource": ""
+                    }
+                ]
+            },
+            {
+                "lidClosed": false,
+                "outputs": [
+                    {
+                        "enabled": true,
+                        "outputIndex": 0,
+                        "position": {
+                            "x": 0,
+                            "y": 0
+                        },
+                        "priority": 0,
+                        "replicationSource": ""
+                    },
+                    {
+                        "enabled": true,
+                        "outputIndex": 1,
+                        "position": {
+                            "x": 1920,
+                            "y": 0
+                        },
+                        "priority": 1,
                         "replicationSource": ""
                     }
                 ]

@@ -292,7 +292,7 @@ plugin=org.kde.plasma.windowlist
 
 [Containments][170][Applets][172][Configuration]
 popupHeight=66
-popupWidth=185
+popupWidth=149
 
 [Containments][170][Applets][173]
 immutability=1
@@ -400,6 +400,9 @@ plugin=org.kde.plasma.timer
 popupHeight=400
 popupWidth=560
 
+[Containments][170][Applets][193][Configuration][General]
+savedAt=2026,9,28,2,55,22.218
+
 [Containments][170][Applets][194]
 immutability=1
 plugin=org.kde.plasma.printmanager
@@ -413,7 +416,7 @@ immutability=1
 plugin=org.kde.plasma.weather
 
 [Containments][170][Applets][195][Configuration]
-popupHeight=400
+popupHeight=245
 popupWidth=560
 
 [Containments][170][Applets][196]
@@ -433,6 +436,7 @@ popupHeight=400
 popupWidth=560
 
 [Containments][170][Applets][199][Configuration][General]
+color=translucent
 cursorPosition=0
 fontSize=10
 noteId=0b8fd752-bf10-4009-8571-667a5f9fea
@@ -454,21 +458,8 @@ cursorPosition=0
 fontSize=10
 noteId=5f526cb2-ba3a-43ce-b6ee-ed2595e5ab
 
-[Containments][170][Applets][208]
-immutability=1
-plugin=org.kde.plasma.notes
-
-[Containments][170][Applets][208][Configuration]
-popupHeight=400
-popupWidth=560
-
-[Containments][170][Applets][208][Configuration][General]
-cursorPosition=0
-fontSize=10
-noteId=845132e9-8b08-4b34-99d9-bf27b335a6
-
 [Containments][170][General]
-AppletOrder=171;172;193;200;173;194;195;196;199;175;207;208
+AppletOrder=171;172;193;200;173;194;195;196;199;175;207
 
 [Containments][29]
 ItemGeometries-1108x1969=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,816,0;
@@ -631,6 +622,9 @@ plugin=org.kde.plasma.pager
 immutability=1
 plugin=org.kde.plasma.icontasks
 
+[Containments][3][Applets][6][Configuration][General]
+launchers=applications:systemsettings.desktop,applications:org.kde.discover.desktop,preferred://filemanager,applications:com.brave.Browser.desktop
+
 [Containments][3][Applets][77]
 immutability=1
 plugin=org.kde.plasma.panelspacer
@@ -784,4 +778,4 @@ Color=#002b36
 
 [ScreenMapping]
 itemsOnDisabledScreens=
-screenMapping=desktop:/面接対策.mak,0,a526bd08-6f34-4f2f-a491-3e80fec14424
+screenMapping=

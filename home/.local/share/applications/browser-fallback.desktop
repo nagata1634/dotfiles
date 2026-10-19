@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Brave（開けなければ Firefox）
+Comment=標準ブラウザ。~/.local/bin/browser-open（セッションの PATH にある）が Brave で開き、失敗したら Firefox で開く
+Exec=browser-open %U
+Icon=com.brave.Browser
+Categories=Network;WebBrowser;
+MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+NoDisplay=true
+StartupNotify=false
