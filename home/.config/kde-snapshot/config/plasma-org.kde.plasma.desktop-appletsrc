@@ -259,8 +259,24 @@ highPrioritySensorIds=["disk/all/read","disk/all/write"]
 lowPrioritySensorIds=[]
 totalSensors=[]
 
+[Containments][109][Applets][211]
+immutability=1
+plugin=dev.yuya.mailwidget
+
+[Containments][109][Applets][211][Configuration]
+popupHeight=400
+popupWidth=560
+
+[Containments][109][Applets][212]
+immutability=1
+plugin=dev.yuya.mailwidget
+
+[Containments][109][Applets][212][Configuration]
+popupHeight=400
+popupWidth=560
+
 [Containments][109][General]
-AppletOrder=137;110;138;136;143;144;149;150;151;153;154;155
+AppletOrder=137;110;138;136;143;144;149;150;151;153;154;155;211;212
 
 [Containments][170]
 activityId=
@@ -462,10 +478,10 @@ noteId=5f526cb2-ba3a-43ce-b6ee-ed2595e5ab
 AppletOrder=171;172;193;200;173;194;195;196;199;175;207
 
 [Containments][29]
-ItemGeometries-1108x1969=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,816,0;
+ItemGeometries-1108x1969=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-213:288,416,448,544,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-214:736,464,368,496,0;
 ItemGeometries-1969x1108=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,544,0;
 ItemGeometriesHorizontal=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,544,0;
-ItemGeometriesVertical=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-209:656,448,448,816,0;
+ItemGeometriesVertical=Applet-157:0,0,272,272,0;Applet-166:32,272,96,96,0;Applet-163:32,384,96,96,0;Applet-160:160,272,96,96,0;Applet-162:160,384,96,96,0;Applet-201:288,0,448,384,0;Applet-213:288,416,448,544,0;Applet-204:736,0,368,448,0;Applet-161:32,496,96,96,0;Applet-159:32,608,96,96,0;Applet-167:160,496,96,96,0;Applet-206:160,608,96,96,0;Applet-214:736,464,368,496,0;
 activityId=a526bd08-6f34-4f2f-a491-3e80fec14424
 formfactor=0
 immutability=1
@@ -559,17 +575,24 @@ plugin=org.kde.plasma.battery
 immutability=1
 plugin=org.kde.plasma.quicklaunch
 
+[Containments][29][Applets][206][Configuration]
+UserBackgroundHints=
+
 [Containments][29][Applets][206][Configuration][General]
 launcherUrls=file:///var/lib/flatpak/exports/share/applications/md.obsidian.Obsidian.desktop
 
-[Containments][29][Applets][209]
+[Containments][29][Applets][213]
+immutability=1
+plugin=dev.yuya.mailwidget
+
+[Containments][29][Applets][214]
 immutability=1
 plugin=org.kde.plasma.notes
 
-[Containments][29][Applets][209][Configuration][General]
+[Containments][29][Applets][214][Configuration][General]
 cursorPosition=0
 fontSize=10
-noteId=20649597-1e22-4be3-98ac-fac3b13298
+noteId=79a03061-8746-4723-8e51-c388f70c74
 
 [Containments][29][ConfigDialog]
 DialogHeight=630

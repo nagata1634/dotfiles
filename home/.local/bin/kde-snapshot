@@ -25,6 +25,7 @@ CONFIG_FILES=(
   kglobalshortcutsrc                         # グローバルショートカット
   kdeglobals                                 # 外観(LnF, 配色, アイコン, フォント)
   mimeapps.list                              # 既定のアプリ（標準ブラウザ＝browser-fallback.desktop）
+  kwinrulesrc                                # ウィンドウルール（メールのウィジェット用 Thunderbird を隠す）
   kcminputrc kxkbrc                          # 入力・キーボード
   powerdevilrc kscreenlockerrc ksmserverrc   # 電源・ロック・セッション
   dolphinrc konsolerc spectaclerc katevirc kwriterc bluedevilglobalrc ktimezonedrc baloofilerc

@@ -1,0 +1,14 @@
+[General]
+count=1
+rules=mailwidget-thunderbird-main
+
+[mailwidget-thunderbird-main]
+Description=Mail Widget: keep the widget Thunderbird's main window out of the taskbar
+skippager=true
+skippagerrule=2
+skiptaskbar=true
+skiptaskbarrule=2
+title=@[^ ]+ - Mozilla Thunderbird$
+titlematch=3
+wmclass=thunderbird-widget
+wmclassmatch=1

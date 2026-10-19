@@ -6,3 +6,6 @@ Seen=true
 
 [Applications][org.mozilla.firefox]
 Seen=true
+
+[Applications][org.mozilla.thunderbird_esr]
+Seen=true

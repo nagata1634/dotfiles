@@ -64,6 +64,15 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 キーは `Meta+HJKL`（フォーカス）/ `+Shift`（移動）/ `+Ctrl`（リサイズ）、`Meta+1〜0` / `Meta+Shift+1〜0` で
 デスクトップ（10 枚）。
 
+## メールのウィジェット（Mail Widget）
+
+実体は独立リポジトリ `~/Documents/plasma-mailwidget`（MIT・未公開）。ウィジェットは `~/.local/share/plasma/plasmoids/dev.yuya.mailwidget` に symlink。
+- ウィジェット用の Thunderbird は**ふつうの Thunderbird と別物**: 専用プロファイル `~/.var/app/org.mozilla.thunderbird_esr/.thunderbird/mailwidget`、
+  アプリ名 `thunderbird-widget`（`--name`/`--class`）、`thunderbird-bg.service` が裏で動かす。ランチャーから開くのは既定のプロファイルのふつうのアプリ（2026-10-20 本人指示）
+- KWin のルール（`kwinrulesrc`）は `thunderbird-widget` のメインのウィンドウだけをタスクバーから外す。最小化はアドオンがする
+- 受け口 `mailbridge.service`（127.0.0.1:47819・鍵は `~/.config/mailbridge/token`、アドオンの設定画面に貼る）
+- 導入・やり直しは `package/contents/install-bridge.sh --kwin-rule`
+
 ## モニタ（Monitor Align）
 
 実体は独立リポジトリ `nagata1634/kwin-monitoralign`（install.sh が Release から導入）。
