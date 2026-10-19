@@ -72,6 +72,11 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 - KWin のルール（`kwinrulesrc`）は `thunderbird-widget` のメインのウィンドウだけをタスクバーから外す。最小化はアドオンがする
 - 受け口 `mailbridge.service`（127.0.0.1:47819・鍵は `~/.config/mailbridge/token`、アドオンの設定画面に貼る）
 - 導入・やり直しは `package/contents/install-bridge.sh --kwin-rule`
+- **カレンダーのウィジェット**（`dev.yuya.calendarwidget`、同じリポジトリの `calendar-package/`）は Thunderbird を通さない。
+  受け口が Google カレンダーの「iCal 形式の非公開アドレス」（標準の ICS）を 10 分ごとに読み、`python3-dateutil`（ベースに同梱）で繰り返しを展開する。
+  アドレスは `~/.config/mailbridge/calendars.json`（600）だけに置く（ウィジェットの設定＝appletsrc に入れると公開の dotfiles に出る）。
+  通知は予定ごとの VALARM の時刻に、ウィジェットで「通知する」にしたカレンダーだけ（`~/.config/mailbridge/calendar.json`）。
+  試験版の calendar API は使わない（2026-10-20 本人方針「できる限り標準」）。Google の「誕生日」は ICS が無いので対象外
 
 ## モニタ（Monitor Align）
 
