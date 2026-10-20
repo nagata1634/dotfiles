@@ -77,6 +77,11 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
   アドレスは `~/.config/mailbridge/calendars.json`（600）だけに置く（ウィジェットの設定＝appletsrc に入れると公開の dotfiles に出る）。
   通知は予定ごとの VALARM の時刻に、ウィジェットで「通知する」にしたカレンダーだけ（`~/.config/mailbridge/calendar.json`）。
   試験版の calendar API は使わない（2026-10-20 本人方針「できる限り標準」）。Google の「誕生日」は ICS が無いので対象外
+- **ToDo のウィジェット**（`dev.yuya.taskwidget`、`task-package/`）だけは標準の手段が無いので試験版を使う（本人了承）:
+  ウィジェット用 Thunderbird に「Provider for Google Calendar」（ATN 署名済み）で Google ToDo のリストだけを登録し、
+  自作アドオンが同梱の calendar experiment（provider の起動部品も登録が必要）で読み書きする。予定のカレンダーはここに登録しない（重複する）。
+  試験版を動かすには `extensions.experiments.allowed` に両アドオンの ID が要る（install-bridge.sh の user.js）
+- ふつうの Thunderbird のリマインダー画面は止めた（`calendar.alarms.show=false`）。予定の通知はカレンダーのウィジェットだけ
 
 ## モニタ（Monitor Align）
 
