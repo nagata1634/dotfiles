@@ -35,6 +35,7 @@ KDE_PACKAGES=(
   "nagata1634/kwin-monitoralign|KWin/Script|monitoralign|.kwinscript|contents/install-daemon.sh"
   "nagata1634/plasma-spanimage|Plasma/Wallpaper|dev.yuya.spanimage|.wallpaper.zip|"
   "DGBooth/HyprKwin|KWin/Script|hyprkwin|.kwinscript|"
+  "Ubiquitine/temporary-virtual-desktops|KWin/Script|temporary-virtual-desktops|.kwinscript|"
 )
 
 # 1. リポジトリ

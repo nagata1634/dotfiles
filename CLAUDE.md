@@ -69,6 +69,13 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 **HyprKwin の既定キーは Hyprland 式で既存と 42 件衝突した**ので、Plasma 側（デスクトップ切替・`Meta+Tab`・ズーム等）を残し
 HyprKwin 側を外した。同梱の `hyprkwin-shortcuts.py apply` は全部 HyprKwin に渡すので使わない。
 
+**仮想デスクトップは動的（GNOME 式）**（2026-10-24 本人指示）: Temporary Virtual Desktops（Ubiquitine/temporary-virtual-desktops）で
+空になったデスクトップを消し、`oneSpare=true` で末尾に空きを 1 つ保つ。表示中のデスクトップと作成直後 1.5 秒は消さない。
+番号キーは HyprKwin 側（`desktopN` / `moveToDesktopN`、`AutoCreateDesktops=true`）に移した。KWin 標準の「デスクトップ N へ」は
+存在しない番号では効かないため。消えると番号は繰り上がる（Mac と同じ）。**日本語の既定名「デスクトップ N」は上流が振り直さない**
+（英語 `Desktop N` 決め打ち）→ 修正 PR を出した（Ubiquitine/temporary-virtual-desktops#10）。取り込まれるまでは `install.sh`
+で入る公式リリースだと名前がずれる（手元は PR 版を入れてある）。
+
 フォーカスは `FocusPolicy=FocusFollowsMouse` + `DelayFocusInterval=300`（2026-10-24 本人指示）。マウスを動かしたときだけ移るので、
 キーで移したフォーカスが保たれる。**FocusUnderMouse は不可**（カーソル下に常に戻す）。
 ロックのキーは外した（`Meta+L` はフォーカスに使う。本人が不要と判断。Screensaver 専用キーのみ）。Spectacle の領域録画（`.desktop` 既定の
