@@ -446,8 +446,8 @@ VirtualKeyboardMode=0
 
 [Windows]
 AutoRaise=false
-DelayFocusInterval=0
-FocusPolicy=ClickToFocus
+DelayFocusInterval=300
+FocusPolicy=FocusFollowsMouse
 
 [Xwayland]
 Scale=1.3

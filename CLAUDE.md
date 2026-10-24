@@ -59,8 +59,10 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 - **KWin の起動直後に出力構成を変えると KWin が落ち**、巻き添えで fcitx5 も死ぬ。
   `monitoralign.service` は `After=plasma-plasmashell.service` + `ExecStartPre=sleep 15`
 
-**Krohnkite**: `kwinrc [Plugins] krohnkiteEnabled=true` が要る。`FocusPolicy=ClickToFocus`
-（マウス追従だとキーでのフォーカス移動が戻される）。`Meta+L` は `ksmserver` のロックと衝突するので、
+**Krohnkite**: `kwinrc [Plugins] krohnkiteEnabled=true` が要る。`FocusPolicy=FocusFollowsMouse` +
+`DelayFocusInterval=300`（2026-10-24 本人指示）。FocusFollowsMouse はマウスを動かしたときだけ移るので、
+キーでのフォーカス移動や Meta+Shift+HJKL で飛ばしたウィンドウのフォーカスが保たれる。**FocusUnderMouse は不可**
+（カーソル下に常に戻すため、キーでのフォーカス移動が戻される）。`Meta+L` は `ksmserver` のロックと衝突するので、
 ロックのキーは外した（本人が不要と判断。Screensaver 専用キーのみ）。**Spectacle（`.desktop` 既定の `Meta+R`/`Meta+Shift+R`＝領域録画）・
 Show Desktop(`Meta+D`)・Edit Tiles(`Meta+T`)・システム設定(`Meta+I`)・絵文字(`Meta+.`) も Krohnkite と重なっていたので外した**。
 `.desktop` 由来の既定キーは `kglobalshortcutsrc` に書かれていないので、重複確認は D-Bus の `allShortcutInfos` を全コンポーネント分走査する（ファイル grep では漏れる）。KWin のクイックタイル（`Meta+矢印`）は Krohnkite と取り合うので解除し、HJKL に一本化（2026-10-24）。
