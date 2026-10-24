@@ -8,13 +8,14 @@ DIR="$HOME/.dotfiles"
 TS="$(date +%Y%m%d-%H%M%S)"
 
 # ~/.config 配下でディレクトリごとリンクするもの
-LINK_DIRS=(fcitx5 environment.d)
+LINK_DIRS=(fcitx5 environment.d fish)
 # ファイル単位でリンクするもの（~/.bashrc.d や systemd/user は環境固有のファイルと同居するため）
 LINK_FILES=(
   .bashrc.d/50-history.sh
   .bashrc.d/60-editor.sh
   .inputrc
   .bashrc.d/90-tty-locale.sh
+  .bashrc.d/99-fish.sh
   .vscode/argv.json
   .config/kde-scripts/lid-unlock-output-fix.sh
   .config/systemd/user/kde-lid-unlock-fix.service

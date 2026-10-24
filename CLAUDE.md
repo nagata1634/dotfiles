@@ -93,6 +93,18 @@ rc を **GUI 定義ごと** 使うので、Konsole 26.08.1 の原本（gui versi
 **キーの重複確認は D-Bus の `allShortcutInfos` を全コンポーネント分走査する**（`.desktop` 由来の既定キーは
 `kglobalshortcutsrc` に書かれないので、ファイル grep では漏れる）。
 
+## シェル（ログインは bash、対話は fish）
+
+2026-10-25 本人指示で fish（＋fzf）を RPM で層に追加。**ログインシェルは bash のまま `chsh` しない**。plasmalogin の
+`/usr/share/plasmalogin/scripts/wayland-session` はログインシェルが bash なら `bash --login` で `~/.bash_profile` →
+`~/.bashrc` → `~/.bashrc.d` を読んで環境を作るが、fish だと `/etc/profile` と `~/.profile` を sh で読むだけになり、
+`~/.bashrc.d`（EDITOR など）と VT のロケール対策（`90-tty-locale.sh`）が効かなくなるため。
+対話時だけ `~/.bashrc.d/99-fish.sh` が `exec fish` する（`$-` に i・`SHLVL=1`・親が fish でない・`NO_FISH` 未設定・
+fish がある、のとき）。Konsole や KDE のセッションには SHLVL が無いので、Konsole の bash は SHLVL=1 で始まる。
+**fish にはヒアドキュメント（`<<EOF`）が無い**（4.9.3 でも。以前 fish をやめた理由）→ fish の中で `bash` と打てば
+SHLVL=2 の本物の bash に入れる。`~/.config/fish/` は dotfiles（LINK_DIRS）。`fish_variables` は記録しない。
+bash 側も `~/.inputrc`（↑↓ で前方一致の履歴検索・補完の大小無視）と `50-history.sh`（5 万件・即時追記）を持つ。
+
 ## メールのウィジェット（Mail Widget）
 
 実体は独立リポジトリ `~/Documents/plasma-mailwidget`（MIT・未公開）。ウィジェットは `~/.local/share/plasma/plasmoids/dev.yuya.mailwidget` に symlink。
