@@ -61,7 +61,9 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 
 **Krohnkite**: `kwinrc [Plugins] krohnkiteEnabled=true` が要る。`FocusPolicy=ClickToFocus`
 （マウス追従だとキーでのフォーカス移動が戻される）。`Meta+L` は `ksmserver` のロックと衝突するので、
-ロックは `Meta+Esc` に移した。KWin のクイックタイル（`Meta+矢印`）は Krohnkite と取り合うので解除し、HJKL に一本化（2026-10-24）。
+ロックのキーは外した（本人が不要と判断。Screensaver 専用キーのみ）。**Spectacle（`.desktop` 既定の `Meta+R`/`Meta+Shift+R`＝領域録画）・
+Show Desktop(`Meta+D`)・Edit Tiles(`Meta+T`)・システム設定(`Meta+I`)・絵文字(`Meta+.`) も Krohnkite と重なっていたので外した**。
+`.desktop` 由来の既定キーは `kglobalshortcutsrc` に書かれていないので、重複確認は D-Bus の `allShortcutInfos` を全コンポーネント分走査する（ファイル grep では漏れる）。KWin のクイックタイル（`Meta+矢印`）は Krohnkite と取り合うので解除し、HJKL に一本化（2026-10-24）。
 キーは `Meta+HJKL`（フォーカス）/ `+Shift`（移動）/ `+Ctrl`（リサイズ）/ `Meta+R`（左右⇔上下の回転）、`Meta+1〜0` / `Meta+Shift+1〜0` で
 デスクトップ（10 枚）。
 

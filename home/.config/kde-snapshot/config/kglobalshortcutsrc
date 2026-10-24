@@ -26,7 +26,7 @@ push_to_talk=none,none,プッシュトゥトーク
 
 [ksmserver]
 Halt Without Confirmation=none,none,確認なしでシャットダウン
-Lock Session=Screensaver\tMeta+Esc,Screensaver\tMeta+L,スクリーンをロック
+Lock Session=Screensaver,Screensaver\tMeta+L,スクリーンをロック
 Log Out=Ctrl+Alt+Del,Ctrl+Alt+Del,ログアウト画面を表示
 Log Out Without Confirmation=none,none,確認なしでログアウト
 LogOut=none,none,ログアウト
@@ -41,7 +41,7 @@ CursorProbeLog=Meta+F12,none,Cursor Probe: Log Position
 Cycle Overview=none,none,オーバービューとグリッドビューを切り替え
 Cycle Overview Opposite=none,none,グリッドビューとオーバービューを切り替え
 Decrease Opacity=none,none,アクティブウィンドウの不透明度を 5% 下げる
-Edit Tiles=Meta+T,Meta+T,タイルエディタの表示を切り替え
+Edit Tiles=none,Meta+T,タイルエディタの表示を切り替え
 Expose=Ctrl+F9\tMeta+F9,Ctrl+F9\tMeta+F9,ウィンドウ一覧の表示を切り替え (現在のデスクトップ)
 ExposeAll=Launch (C)\tCtrl+F10\tMeta+F10,Launch (C)\tCtrl+F10\tMeta+F10,ウィンドウ一覧の表示を切り替え (全デスクトップ)
 ExposeClass=Ctrl+F7\tMeta+F7,Ctrl+F7\tMeta+F7,ウィンドウ一覧の表示を切り替え (ウィンドウクラスごと)
@@ -114,7 +114,7 @@ PoloniumSetEngineThreeColumn=none,none,Polonium: Use Three Column Engine
 PoloniumToggleActiveTiling=none,none,Polonium: Toggle Tiling on Active Window
 PoloniumToggleSettingsMenu=none,none,Polonium: Toggle Settings Menu
 Setup Window Shortcut=none,none,ウィンドウショートカットの設定
-Show Desktop=Meta+D,Meta+D,デスクトップをプレビュー
+Show Desktop=none,Meta+D,デスクトップをプレビュー
 Switch One Desktop Down=Meta+Ctrl+Down,Meta+Ctrl+Down,一つ下のデスクトップに切り替え
 Switch One Desktop Up=Meta+Ctrl+Up,Meta+Ctrl+Up,一つ上のデスクトップに切り替え
 Switch One Desktop to the Left=Meta+Ctrl+Left,Meta+Ctrl+Left,一つ左のデスクトップに切り替え
@@ -326,9 +326,16 @@ switch to next activity=none,none,次のアクティビティに切り替え
 switch to previous activity=none,none,前のアクティビティに切り替え
 toggle do not disturb=none,none,マナーモードをオン/オフ
 
+[services][org.kde.plasma.emojier.desktop]
+_launch=Meta+Ctrl+Alt+Shift+Space
+
 [services][org.kde.spectacle.desktop]
 CurrentMonitorScreenShot=none
 OpenWithoutScreenshot=none
+RecordRegion=none
+
+[services][systemsettings.desktop]
+_launch=Tools
 
 [yakuake]
 _k_friendly_name=Yakuake
