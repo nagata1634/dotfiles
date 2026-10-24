@@ -34,7 +34,7 @@ ENABLE_UNITS=(ssh-agent.socket kde-lid-unlock-fix.service monitoralign.service q
 KDE_PACKAGES=(
   "nagata1634/kwin-monitoralign|KWin/Script|monitoralign|.kwinscript|contents/install-daemon.sh"
   "nagata1634/plasma-spanimage|Plasma/Wallpaper|dev.yuya.spanimage|.wallpaper.zip|"
-  "anametologin/krohnkite|KWin/Script|krohnkite|.kwinscript|"
+  "DGBooth/HyprKwin|KWin/Script|hyprkwin|.kwinscript|"
 )
 
 # 1. リポジトリ

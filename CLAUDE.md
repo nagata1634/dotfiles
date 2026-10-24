@@ -6,7 +6,7 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 `nagata1634/pxe-boot` の Kickstart と初回起動サービス。この dotfiles は `~/` の層だけ。** ここには「今動いている設定」と「踏むと壊れる罠」だけを書く。
 経緯（Sway/Sericea 時代、試して捨てた案）は git 履歴にある（2026-09-27 に圧縮）。
 
-構成: plasmalogin → `startplasma-wayland`、IME は fcitx5 + Mozc（KWin が起動）、タイルは Krohnkite、
+構成: plasmalogin → `startplasma-wayland`、IME は fcitx5 + Mozc（KWin が起動）、タイルは HyprKwin、
 ロックは kscreenlocker、ランチャーは KRunner、ブラウザは Brave(Flatpak)（標準ブラウザは `browser-fallback.desktop`＝
 `~/.local/bin/browser-open` が Brave で開き、10 秒以内に失敗したら Firefox で開く。2026-10-20 本人指示）。`/var/home` は LUKS 上の btrfs。
 アプリストアは **Discover だけ**（ベース同梱で外せず、rpm-ostree 更新の通知も Discover の notifier しか
@@ -59,15 +59,23 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
 - **KWin の起動直後に出力構成を変えると KWin が落ち**、巻き添えで fcitx5 も死ぬ。
   `monitoralign.service` は `After=plasma-plasmashell.service` + `ExecStartPre=sleep 15`
 
-**Krohnkite**: `kwinrc [Plugins] krohnkiteEnabled=true` が要る。`FocusPolicy=FocusFollowsMouse` +
-`DelayFocusInterval=300`（2026-10-24 本人指示）。FocusFollowsMouse はマウスを動かしたときだけ移るので、
-キーでのフォーカス移動や Meta+Shift+HJKL で飛ばしたウィンドウのフォーカスが保たれる。**FocusUnderMouse は不可**
-（カーソル下に常に戻すため、キーでのフォーカス移動が戻される）。`Meta+L` は `ksmserver` のロックと衝突するので、
-ロックのキーは外した（本人が不要と判断。Screensaver 専用キーのみ）。**Spectacle（`.desktop` 既定の `Meta+R`/`Meta+Shift+R`＝領域録画）・
-Show Desktop(`Meta+D`)・Edit Tiles(`Meta+T`)・システム設定(`Meta+I`)・絵文字(`Meta+.`) も Krohnkite と重なっていたので外した**。
-`.desktop` 由来の既定キーは `kglobalshortcutsrc` に書かれていないので、重複確認は D-Bus の `allShortcutInfos` を全コンポーネント分走査する（ファイル grep では漏れる）。KWin のクイックタイル（`Meta+矢印`）は Krohnkite と取り合うので解除し、HJKL に一本化（2026-10-24）。
-キーは `Meta+HJKL`（フォーカス）/ `+Shift`（移動）/ `+Ctrl`（リサイズ）/ `Meta+R`（左右⇔上下の回転）、`Meta+1〜0` / `Meta+Shift+1〜0` で
-デスクトップ（10 枚）。
+**タイル = HyprKwin**（2026-10-24 に Krohnkite から切替。本人が Hyprland の dwindle＝螺旋状の配置と、分割1つ単位の
+向き切替 `toggleSplit` を望んだため。Krohnkite の Spiral は分割の向きが固定で回せず、外付けスクリプトでも足せない）。
+`kwinrc [Plugins] hyprkwinEnabled=true`、`[Script-hyprkwin]` で `PerOutputWorkspaces` / `AutoCreateDesktops` /
+`StartOnFirstDesktop` を false（デスクトップ 10 枚・`Meta+1〜0` の従来の使い方を保つ）。Krohnkite は無効化・キー全解除で残置。
+キー: `Meta+HJKL`（フォーカス、矢印も可）/ `+Shift`（移動＝Hyprland の movewindow。隣に差し込み、端ならその方向のモニターへ。
+下にモニターが無ければ何もしない）/ `+Ctrl`（境目の移動）/ `Meta+R`（分割の向き切替）/ `Meta+Shift+R`（分割の左右入替）/
+`Meta+F`（フロート）/ `Meta+\`（レイアウト切替）/ `Meta+/`（キー一覧。既定の `Meta+K` は上フォーカスに使う）。
+**HyprKwin の既定キーは Hyprland 式で既存と 42 件衝突した**ので、Plasma 側（デスクトップ切替・`Meta+Tab`・ズーム等）を残し
+HyprKwin 側を外した。同梱の `hyprkwin-shortcuts.py apply` は全部 HyprKwin に渡すので使わない。
+
+フォーカスは `FocusPolicy=FocusFollowsMouse` + `DelayFocusInterval=300`（2026-10-24 本人指示）。マウスを動かしたときだけ移るので、
+キーで移したフォーカスが保たれる。**FocusUnderMouse は不可**（カーソル下に常に戻す）。
+ロックのキーは外した（`Meta+L` はフォーカスに使う。本人が不要と判断。Screensaver 専用キーのみ）。Spectacle の領域録画（`.desktop` 既定の
+`Meta+R`/`Meta+Shift+R`）・Show Desktop(`Meta+D`)・Edit Tiles(`Meta+T`)・システム設定(`Meta+I`)・絵文字(`Meta+.`)・
+クイックタイル（`Meta+矢印`）も外してある。
+**キーの重複確認は D-Bus の `allShortcutInfos` を全コンポーネント分走査する**（`.desktop` 由来の既定キーは
+`kglobalshortcutsrc` に書かれないので、ファイル grep では漏れる）。
 
 ## メールのウィジェット（Mail Widget）
 

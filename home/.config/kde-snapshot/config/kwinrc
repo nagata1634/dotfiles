@@ -20,9 +20,15 @@ Active=true
 
 [Plugins]
 cursorprobeEnabled=false
-krohnkiteEnabled=true
+hyprkwinEnabled=true
+krohnkiteEnabled=false
 monitoralignEnabled=true
 slideEnabled=false
+
+[Script-hyprkwin]
+AutoCreateDesktops=false
+PerOutputWorkspaces=false
+StartOnFirstDesktop=false
 
 [Script-krohnkite]
 floatedWindowsLayer=0

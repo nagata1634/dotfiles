@@ -20,7 +20,7 @@ CONFIG_FILES=(
   plasmashellrc                              # スクリーン割り当て(ScreenConnectors)・パネル状態
   plasmarc                                   # Plasma テーマ
   plasmanotifyrc                             # 通知
-  kwinrc                                     # KWin: 仮想デスクトップ, Krohnkite, Monitor Align, 装飾
+  kwinrc                                     # KWin: 仮想デスクトップ, HyprKwin, Monitor Align, 装飾
   kwinoutputconfig.json                      # モニタ配置(同一機材前提)
   kglobalshortcutsrc                         # グローバルショートカット
   kdeglobals                                 # 外観(LnF, 配色, アイコン, フォント)
