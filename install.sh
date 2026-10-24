@@ -11,7 +11,9 @@ TS="$(date +%Y%m%d-%H%M%S)"
 LINK_DIRS=(fcitx5 environment.d)
 # ファイル単位でリンクするもの（~/.bashrc.d や systemd/user は環境固有のファイルと同居するため）
 LINK_FILES=(
+  .bashrc.d/50-history.sh
   .bashrc.d/60-editor.sh
+  .inputrc
   .bashrc.d/90-tty-locale.sh
   .vscode/argv.json
   .config/kde-scripts/lid-unlock-output-fix.sh

@@ -1,0 +1,15 @@
+# readline（bash の入力行）の設定。Fedora の既定（Home/End キーなど）を読んでから足す
+$include /etc/inputrc
+
+# 補完: 大文字小文字と - / _ を区別しない、候補が複数なら Tab 1回で一覧、種類ごとに色分け
+set completion-ignore-case on
+set completion-map-case on
+set show-all-if-ambiguous on
+set colored-stats on
+set colored-completion-prefix on
+
+# ↑/↓ = 打ちかけの文字で前方一致の履歴検索（空のときは普通の履歴移動と同じ）
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\eOA": history-search-backward
+"\eOB": history-search-forward
