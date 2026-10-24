@@ -26,7 +26,7 @@ push_to_talk=none,none,プッシュトゥトーク
 
 [ksmserver]
 Halt Without Confirmation=none,none,確認なしでシャットダウン
-Lock Session=Screensaver\tMeta+L,Screensaver\tMeta+L,スクリーンをロック
+Lock Session=Screensaver\tMeta+Esc,Screensaver\tMeta+L,スクリーンをロック
 Log Out=Ctrl+Alt+Del,Ctrl+Alt+Del,ログアウト画面を表示
 Log Out Without Confirmation=none,none,確認なしでログアウト
 LogOut=none,none,ログアウト
@@ -206,12 +206,12 @@ Window Pack Down=none,none,ウィンドウを下に移動
 Window Pack Left=none,none,ウィンドウを左に移動
 Window Pack Right=none,none,ウィンドウを右に移動
 Window Pack Up=none,none,ウィンドウを上に移動
-Window Quick Tile Bottom=Meta+Down,Meta+Down,ウィンドウを下にタイル化
+Window Quick Tile Bottom=none,Meta+Down,ウィンドウを下にタイル化
 Window Quick Tile Bottom Left=none,none,ウィンドウを左下にタイル化
 Window Quick Tile Bottom Right=none,none,ウィンドウを右下にタイル化
-Window Quick Tile Left=Meta+Left,Meta+Left,ウィンドウを左にタイル化
-Window Quick Tile Right=Meta+Right,Meta+Right,ウィンドウを右にタイル化
-Window Quick Tile Top=Meta+Up,Meta+Up,ウィンドウを上にタイル化
+Window Quick Tile Left=none,Meta+Left,ウィンドウを左にタイル化
+Window Quick Tile Right=none,Meta+Right,ウィンドウを右にタイル化
+Window Quick Tile Top=none,Meta+Up,ウィンドウを上にタイル化
 Window Quick Tile Top Left=none,none,ウィンドウを左上にタイル化
 Window Quick Tile Top Right=none,none,ウィンドウを右上にタイル化
 Window Raise=none,none,ウィンドウを前面に

@@ -60,8 +60,9 @@ Fedora **Kinoite**（KDE Plasma 6 / Wayland）の個人環境。**方針はス�
   `monitoralign.service` は `After=plasma-plasmashell.service` + `ExecStartPre=sleep 15`
 
 **Krohnkite**: `kwinrc [Plugins] krohnkiteEnabled=true` が要る。`FocusPolicy=ClickToFocus`
-（マウス追従だとキーでのフォーカス移動が戻される）。`Meta+L` は `ksmserver` のロックと衝突する。
-キーは `Meta+HJKL`（フォーカス）/ `+Shift`（移動）/ `+Ctrl`（リサイズ）、`Meta+1〜0` / `Meta+Shift+1〜0` で
+（マウス追従だとキーでのフォーカス移動が戻される）。`Meta+L` は `ksmserver` のロックと衝突するので、
+ロックは `Meta+Esc` に移した。KWin のクイックタイル（`Meta+矢印`）は Krohnkite と取り合うので解除し、HJKL に一本化（2026-10-24）。
+キーは `Meta+HJKL`（フォーカス）/ `+Shift`（移動）/ `+Ctrl`（リサイズ）/ `Meta+R`（左右⇔上下の回転）、`Meta+1〜0` / `Meta+Shift+1〜0` で
 デスクトップ（10 枚）。
 
 ## メールのウィジェット（Mail Widget）
