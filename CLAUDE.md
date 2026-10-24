@@ -76,6 +76,12 @@ HyprKwin 側を外した。同梱の `hyprkwin-shortcuts.py apply` は全部 Hyp
 （英語 `Desktop N` 決め打ち）→ 修正 PR を出した（Ubiquitine/temporary-virtual-desktops#10）。取り込まれるまでは `install.sh`
 で入る公式リリースだと名前がずれる（手元は PR 版を入れてある）。
 
+**Konsole のペインも Vim 式**（2026-10-25 本人指示）: `Ctrl+Shift+H/J/K/L` でペイン移動（矢印も残す）。既定で `Ctrl+Shift+H` は
+「ビューの切り離し」（キー解除、メニューに残る）、`Ctrl+Shift+K` は「スクロール履歴の消去とリセット」（`Ctrl+Shift+X` へ移動）だった。
+Konsole のキーは `~/.local/share/kxmlgui5/konsole/{konsoleui,sessionui}.rc` の `<ActionProperties>` で上書きする。KXmlGui は手元の
+rc を **GUI 定義ごと** 使うので、Konsole 26.08.1 の原本（gui version 20 / 36）を丸ごと置いて末尾に足してある。Konsole が rc の version
+を上げると原本側に置き換わり、ActionProperties だけ引き継がれる（KXmlGui の仕様）。kde-snapshot の DATA_DIRS で記録。
+
 フォーカスは `FocusPolicy=FocusFollowsMouse` + `DelayFocusInterval=300`（2026-10-24 本人指示）。マウスを動かしたときだけ移るので、
 キーで移したフォーカスが保たれる。**FocusUnderMouse は不可**（カーソル下に常に戻す）。
 ロックのキーは外した（`Meta+L` はフォーカスに使う。本人が不要と判断。Screensaver 専用キーのみ）。Spectacle の領域録画（`.desktop` 既定の

@@ -38,6 +38,7 @@ EXTRA_FILES=(
 DATA_DIRS=(
   plasma_icons   # デスクトップの「アイコン」ウィジェットの実体(.desktop)
   konsole        # Konsole プロファイル
+  kxmlgui5/konsole   # Konsole のキー（ペイン移動を Ctrl+Shift+HJKL に。ActionProperties で上書き）
 )
 
 c_ok()   { printf '\033[1;32m✓\033[0m %s\n' "$*"; }
@@ -62,7 +63,7 @@ save() {
   done
   for f in "${DATA_DIRS[@]}"; do
     [ -d "$HOME/.local/share/$f" ] || continue
-    rm -rf "$SNAP/share/$f"; cp -a "$HOME/.local/share/$f" "$SNAP/share/$f"
+    rm -rf "$SNAP/share/$f"; mkdir -p "$(dirname "$SNAP/share/$f")"; cp -a "$HOME/.local/share/$f" "$SNAP/share/$f"
   done
   for f in "${EXTRA_FILES[@]}"; do
     [ -f "$HOME/$f" ] || continue
