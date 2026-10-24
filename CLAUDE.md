@@ -81,6 +81,9 @@ HyprKwin 側を外した。同梱の `hyprkwin-shortcuts.py apply` は全部 Hyp
 Konsole のキーは `~/.local/share/kxmlgui5/konsole/{konsoleui,sessionui}.rc` の `<ActionProperties>` で上書きする。KXmlGui は手元の
 rc を **GUI 定義ごと** 使うので、Konsole 26.08.1 の原本（gui version 20 / 36）を丸ごと置いて末尾に足してある。Konsole が rc の version
 を上げると原本側に置き換わり、ActionProperties だけ引き継がれる（KXmlGui の仕様）。kde-snapshot の DATA_DIRS で記録。
+分割は Vim の `Ctrl+W` 式で、**`Ctrl+Shift+W` を接頭キー**にした（素の `Ctrl+W` はシェルの単語削除なので奪わない）: `→ s` 上下 /
+`→ v` 左右 / `→ =` 均等 / `→ q`・`→ c` 閉じる。代わりに `Ctrl+Shift+W` 単独では閉じない。Konsole は Tab・矢印・`/`・`.`・スペース等だけ
+端末に先取りする（TerminalDisplay::handleShortcutOverrideEvent）ので、2 打目の英字は横取りされない。
 
 フォーカスは `FocusPolicy=FocusFollowsMouse` + `DelayFocusInterval=300`（2026-10-24 本人指示）。マウスを動かしたときだけ移るので、
 キーで移したフォーカスが保たれる。**FocusUnderMouse は不可**（カーソル下に常に戻す）。

@@ -87,5 +87,7 @@
     </ToolBar>
   <ActionProperties scheme="Default">
     <Action name="clear-history-and-reset" shortcut="Ctrl+Shift+X"/>
+    <!-- Ctrl+Shift+W is now a prefix: close is Ctrl+Shift+W then q/c like Vim's Ctrl+W q/c -->
+    <Action name="close-session" shortcut="Ctrl+Shift+W, Q; Ctrl+Shift+W, C"/>
   </ActionProperties>
 </gui>

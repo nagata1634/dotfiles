@@ -69,5 +69,9 @@
     <Action name="focus-view-above" shortcut="Ctrl+Shift+K; Ctrl+Shift+Up"/>
     <Action name="focus-view-right" shortcut="Ctrl+Shift+L; Ctrl+Shift+Right"/>
     <Action name="detach-view" shortcut=""/>
+    <!-- Ctrl+Shift+W then s/v/= like Vim's Ctrl+W s/v/= -->
+    <Action name="split-view-top-bottom" shortcut="Ctrl+Shift+W, S; Ctrl+)"/>
+    <Action name="split-view-left-right" shortcut="Ctrl+Shift+W, V; Ctrl+("/>
+    <Action name="equal-size-view" shortcut="Ctrl+Shift+W, =; Ctrl+Shift+\"/>
   </ActionProperties>
 </gui>
